@@ -89,6 +89,7 @@ describe("PlayersRepository::add", () => {
     expect(game.save.mock.calls.length).toBe(1);
     expect(item.state.players.length).toBe(1);
     expect(item.state.players[0]).toBe(john);
+    expect(item.state.players[0].color).toBe(0);
   });
 
   test("add player and update game", async () => {
@@ -115,5 +116,6 @@ describe("PlayersRepository::add", () => {
     expect(item.state.players.length).toBe(2);
     expect(item.state.players[0]).toBe(john);
     expect(item.state.players[1]).toBe(jane);
+    expect(item.state.players[1].color).toBe(1);
   });
 });
