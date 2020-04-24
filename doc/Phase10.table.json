@@ -1,0 +1,53 @@
+"gameId": "3d4285f0-e52b-401a-a59b-112b38c4a26b",
+"timestamp": "Timestamp",
+"hasStarted": false|true,
+"state": {
+  "stacks":{
+    "available":[
+      37,38,39,40,41,42,43,44,45,46,47,48,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48
+    ],
+    "discarded": [
+      1,2,3,4,5,13
+    ]
+  },
+  "dices": [3, 3],
+  "activePlayer": 1,
+  "players": [
+    {
+      "connectionId": "3d4285f0-e52b-401a-a59b-112b38c4a26b",
+      "name":"jonathan",
+      "phase": 1,
+      "boardPosition": 3,
+      "cards": [6,7,8,9,10,11,12,14,15,36],
+      "collections": [
+        {"type":"color", "cards":[]},
+        {"type":"set", "cards":[]},
+        {"type":"seq", "cards":[]},
+      ]
+    },
+    {
+      "connectionId": "3d4285f0-e52b-401a-a59b-112b38c4a26b",
+      "name":"sus",
+      "phase": 1,
+      "boardPosition": 11,
+      "cards": [16,17,18,19,20,21,22,23,24,25],
+      "collections": [
+        {"type":"color", "cards":[]},
+        {"type":"set", "cards":[]},
+        {"type":"seq", "cards":[]},
+      ]
+    },
+    {
+      "connectionId": "3d4285f0-e52b-401a-a59b-112b38c4a26b",
+      "name":"unai",
+      "phase": 1,
+      "boardPosition": 1,
+      "cards": [26,27,28,29,30,31,32,33,34,35],
+      "collections": [
+        {"type":"color", "cards":[]},
+        {"type":"set", "cards":[]},
+        {"type":"seq", "cards":[]},
+      ]
+    }
+  ]
+}

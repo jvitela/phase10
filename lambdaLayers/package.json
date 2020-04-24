@@ -1,0 +1,13 @@
+{
+  "name": "lambdalayers",
+  "version": "1.0.0",
+  "description": "Lambda layers for client",
+  "scripts": {
+    "test": "jest"
+  },
+  "author": "jvitela",
+  "license": "MIT",
+  "devDependencies": {
+    "jest": "^25.4.0"
+  }
+}

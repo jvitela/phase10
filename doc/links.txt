@@ -1,0 +1,39 @@
+
+Main
+https://docs.aws.amazon.com/index.html
+
+Identity and Access Management
+https://docs.aws.amazon.com/iam/
+
+S3
+https://docs.aws.amazon.com/s3/
+
+API Gateway
+https://docs.aws.amazon.com/apigateway/
+
+Lambda
+https://docs.aws.amazon.com/lambda/
+https://medium.com/@anjanava.biswas/nodejs-runtime-environment-with-aws-lambda-layers-f3914613e20e
+
+
+DynamoDB
+https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Introduction.html
+https://aws.amazon.com/blogs/aws/dynamodb-update-json-and-more/
+
+AWS SDK for JavaScript
+https://docs.aws.amazon.com/sdk-for-javascript/
+
+
+Examples
+https://github.com/aws-samples/aws-serverless-workshops/tree/master/WebApplication/0_Setup
+https://github.com/aws-samples/simple-websockets-chat-app
+
+CloudFront
+https://docs.aws.amazon.com/cloudfront/
+https://aws.amazon.com/about-aws/whats-new/2018/11/amazon-cloudfront-announces-support-for-the-websocket-protocol/
+
+VS Code toolkit
+https://docs.aws.amazon.com/toolkit-for-vscode/
+
+Cloud9 (IDE)
+https://aws.amazon.com/cloud9/
