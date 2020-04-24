@@ -6,6 +6,7 @@ class Player {
     this.boardPosition = 0;
     this.cards = [];
     this.collections = [];
+    this.color = null;
   }
 }
 

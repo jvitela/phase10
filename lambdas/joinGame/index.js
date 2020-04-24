@@ -4,6 +4,7 @@ const GameRepository = require("/opt/phase10/repositories/GameRepository");
 const PlayersRepository = require("/opt/phase10/repositories/PlayersRepository");
 
 AWS.config.update({ region: process.env.AWS_REGION });
+
 const dynamo = new AWS.DynamoDB.DocumentClient({ apiVersion: "2012-08-10" });
 
 /*
@@ -25,8 +26,11 @@ exports.handler = async function handler(event) {
 
   try {
     await players.add(player);
-    return { statusCode: 200 };
+    return {
+      statusCode: 200,
+      body: JSON.stringify(player),
+    };
   } catch (err) {
-    return { statusCode: 500, body: err.message };
+    return { statusCode: 500, body: JSON.stringify({ message: err.message }) };
   }
 };

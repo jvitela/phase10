@@ -10,6 +10,8 @@ https://docs.aws.amazon.com/s3/
 
 API Gateway
 https://docs.aws.amazon.com/apigateway/
+https://aws.amazon.com/de/blogs/compute/announcing-websocket-apis-in-amazon-api-gateway/
+https://docs.aws.amazon.com/apigateway/latest/developerguide/websocket-api-develop.html
 
 Lambda
 https://docs.aws.amazon.com/lambda/
