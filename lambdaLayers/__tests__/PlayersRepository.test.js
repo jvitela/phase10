@@ -49,7 +49,7 @@ describe("PlayersRepository::add", () => {
     const john = new Player("1", "John Doe");
     const item = {
       state: {
-        players: [john],
+        players: [{ ...john, color: 0 }],
         activePlayer: 0,
       },
     };
@@ -61,12 +61,15 @@ describe("PlayersRepository::add", () => {
 
     const players = new PlayersRepository(game);
 
-    await players.add(john);
+    const result = await players.add(john);
     expect(game.load.mock.calls.length).toBe(1);
     expect(game.create.mock.calls.length).toBe(0);
     expect(game.save.mock.calls.length).toBe(0);
     expect(item.state.players.length).toBe(1);
-    expect(item.state.players[0]).toBe(john);
+    expect(item.state.players[0]).toEqual({ ...john, color: 0 });
+    expect(result).not.toBe(john);
+    expect(result).toBe(item.state.players[0]);
+    expect(result.color).toBe(0);
   });
 
   test("create game and add first player", async () => {
@@ -83,13 +86,14 @@ describe("PlayersRepository::add", () => {
     const john = new Player("1", "John Doe");
     const players = new PlayersRepository(game);
 
-    await players.add(john);
+    const result = await players.add(john);
     expect(game.load.mock.calls.length).toBe(1);
     expect(game.create.mock.calls.length).toBe(1);
     expect(game.save.mock.calls.length).toBe(1);
     expect(item.state.players.length).toBe(1);
     expect(item.state.players[0]).toBe(john);
     expect(item.state.players[0].color).toBe(0);
+    expect(result).toBe(john);
   });
 
   test("add player and update game", async () => {
@@ -98,7 +102,7 @@ describe("PlayersRepository::add", () => {
 
     const item = {
       state: {
-        players: [john],
+        players: [{ ...john, color: 0 }],
         activePlayer: 0,
       },
     };
@@ -109,13 +113,15 @@ describe("PlayersRepository::add", () => {
     };
     const players = new PlayersRepository(game);
 
-    await players.add(jane);
+    const result = await players.add(jane);
     expect(game.load.mock.calls.length).toBe(1);
     expect(game.create.mock.calls.length).toBe(0);
     expect(game.save.mock.calls.length).toBe(1);
     expect(item.state.players.length).toBe(2);
-    expect(item.state.players[0]).toBe(john);
-    expect(item.state.players[1]).toBe(jane);
+    expect(item.state.players[0]).not.toBe(john);
+    expect(item.state.players[0]).toEqual({ ...john, color: 0 });
+    expect(item.state.players[1]).toEqual({ ...jane, color: 1 });
     expect(item.state.players[1].color).toBe(1);
+    expect(result).toBe(jane);
   });
 });

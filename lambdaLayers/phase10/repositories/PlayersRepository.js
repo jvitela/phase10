@@ -36,6 +36,7 @@ class PlayersRepository {
     newPlayer.color = game.state.players.length;
     game.state.players.push(newPlayer);
     await this.game.save(game);
+    return newPlayer;
   }
 }
 
