@@ -1,0 +1,16 @@
+{
+  "scripts": {
+    "test": "jest"
+  },
+  "author": "jvitela",
+  "license": "MIT",
+  "devDependencies": {
+    "jest": "^25.4.0"
+  },
+  "jest": {
+    "moduleNameMapper": {
+      "/opt/phase10/(.*)": "<rootDir>/../../lambdaLayers/phase10/$1",
+      "TestUtils": "<rootDir>../../lambdaLayers/TestUtils"
+    }
+  }
+}
