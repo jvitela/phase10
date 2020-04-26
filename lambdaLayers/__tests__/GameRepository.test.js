@@ -18,8 +18,10 @@ describe("GameRepository", () => {
     expect(game.tableName).toBe("Test_table");
     expect(game.state).toBe(null);
   });
+});
 
-  test("load empty game success", async () => {
+describe("GameRepository::load", () => {
+  test("returns new state when no previous game exists", async () => {
     const dynamo = {
       get: fnSuccessReq(),
     };
@@ -28,7 +30,7 @@ describe("GameRepository", () => {
     expect(game.state).toEqual(game.getInitialState());
   });
 
-  test("loadGame success", async () => {
+  test("returns state of existing game", async () => {
     const dynamo = {
       get: fnSuccessReq({
         Item: {
@@ -41,15 +43,17 @@ describe("GameRepository", () => {
     expect(game.state).toEqual({ foo: "bar" });
   });
 
-  test("loadGame error", () => {
+  test("throws error from dynamoDB if cannot read game", () => {
     const dynamo = {
       get: fnErrorReq(new Error("error")),
     };
     const game = new GameRepository(dynamo);
     expect(game.load()).rejects.toThrow("error");
   });
+});
 
-  test("saveGame success", () => {
+describe("GameRepository::save", () => {
+  test("saves the game to dynamoDB", () => {
     const dynamo = {
       put: fnSuccessReq(),
     };
@@ -68,7 +72,7 @@ describe("GameRepository", () => {
     });
   });
 
-  test("saveGame error", () => {
+  test("throws error from dynamoDB if cannot save the game", () => {
     const dynamo = {
       put: fnErrorReq(new Error("error")),
     };
