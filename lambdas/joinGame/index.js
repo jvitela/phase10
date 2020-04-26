@@ -1,11 +1,13 @@
 const AWS = require("aws-sdk");
-const Player = require("/opt/phase10/entities/Player");
-const GameRepository = require("/opt/phase10/repositories/GameRepository");
-const PlayersRepository = require("/opt/phase10/repositories/PlayersRepository");
+// const Player = require("/opt/phase10/entities/Player");
+// const ValidationError = require("/opt/phase10/entities/ValidationError");
+// const ResponseAction = require("/opt/phase10/entities/ResponseAction");
+// const GameRepository = require("/opt/phase10/repositories/GameRepository");
+// const PlayersRepository = require("/opt/phase10/repositories/PlayersRepository");
+const { joinGame } = require("./handler");
 
 AWS.config.update({ region: process.env.AWS_REGION });
-
-const dynamo = new AWS.DynamoDB.DocumentClient({ apiVersion: "2012-08-10" });
+const dynamoDB = new AWS.DynamoDB.DocumentClient({ apiVersion: "2012-08-10" });
 
 /*
   Route Selection Expression should be $request.body.action
@@ -18,19 +20,12 @@ const dynamo = new AWS.DynamoDB.DocumentClient({ apiVersion: "2012-08-10" });
   }
 */
 exports.handler = async function handler(event) {
-  const connectionId = event.requestContext.connectionId;
-  const body = JSON.parse(event.body);
-  const player = new Player(connectionId, body.payload.name);
-  const game = new GameRepository(dynamo);
-  const players = new PlayersRepository(game);
+  const apigwManagementApi = new AWS.ApiGatewayManagementApi({
+    apiVersion: "2018-11-29",
+    endpoint:
+      event.requestContext.domainName + "/" + event.requestContext.stage,
+  });
 
-  try {
-    await players.add(player);
-    return {
-      statusCode: 200,
-      body: JSON.stringify(player),
-    };
-  } catch (err) {
-    return { statusCode: 500, body: JSON.stringify({ message: err.message }) };
-  }
+  const response = await joinGame(dynamoDB, apigwManagementApi, event);
+  return response;
 };
