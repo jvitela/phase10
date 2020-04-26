@@ -1,25 +1,19 @@
-const ValidationError = require("../entities/ValidationError");
-const isValidName = /^[a-zA-Z0-9.!_ ]{3,}$/;
-
 class GameRepository {
   constructor(dynamoDBDocumentClient, tableName = "Phase10") {
     this.db = dynamoDBDocumentClient;
     this.tableName = tableName;
+    this.state = null;
   }
 
-  create(gameId = "default") {
+  getInitialState() {
     return {
-      gameId,
-      timestamp: `${Date.now()}`,
-      state: {
-        stacks: {
-          available: [],
-          discarded: [],
-        },
-        dices: [],
-        activePlayer: 0,
-        players: [],
+      stacks: {
+        available: [],
+        discarded: [],
       },
+      dices: [],
+      activePlayer: 0,
+      players: [],
     };
   }
 
@@ -34,17 +28,21 @@ class GameRepository {
     const resp = await this.db.get(params).promise();
 
     if (resp && resp.Item && resp.Item.state) {
-      resp.Item.state = JSON.parse(resp.Item.state);
+      // TODO: don't return data if timestamp is older than X hours
+      this.state = JSON.parse(resp.Item.state);
     }
-    return resp.Item;
+
+    if (!this.state) {
+      this.state = this.getInitialState();
+    }
   }
 
-  save({ gameId, timestamp, state }) {
+  async save() {
     const request = {
       Item: {
-        gameId,
-        timestamp,
-        state: JSON.stringify(state),
+        gameId: "default",
+        timestamp: Date.now(),
+        state: JSON.stringify(this.state),
       },
       TableName: this.tableName,
     };

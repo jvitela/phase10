@@ -16,24 +16,29 @@ describe("GameRepository", () => {
     const game = new GameRepository(dynamo, "Test_table");
     expect(game.db).toBe(dynamo);
     expect(game.tableName).toBe("Test_table");
+    expect(game.state).toBe(null);
   });
 
-  test("loadGame success", () => {
+  test("load empty game success", async () => {
+    const dynamo = {
+      get: fnSuccessReq(),
+    };
+    const game = new GameRepository(dynamo);
+    await game.load();
+    expect(game.state).toEqual(game.getInitialState());
+  });
+
+  test("loadGame success", async () => {
     const dynamo = {
       get: fnSuccessReq({
         Item: {
-          gameId: "123",
-          timestamp: "456",
-          state: "{}",
+          state: '{"foo":"bar"}',
         },
       }),
     };
     const game = new GameRepository(dynamo);
-    expect(game.load()).resolves.toEqual({
-      gameId: "123",
-      timestamp: "456",
-      state: {},
-    });
+    await game.load();
+    expect(game.state).toEqual({ foo: "bar" });
   });
 
   test("loadGame error", () => {
@@ -45,24 +50,19 @@ describe("GameRepository", () => {
   });
 
   test("saveGame success", () => {
-    const data = {
-      gameId: "gameId",
-      timestamp: "timestamp",
-      state: {},
-    };
     const dynamo = {
       put: fnSuccessReq(),
     };
     const game = new GameRepository(dynamo);
-    expect(() => game.save(data)).not.toThrow();
+    game.state = { foo: "bar" };
+    expect(() => game.save()).not.toThrow();
     expect(dynamo.put.mock.calls.length).toEqual(1); // Check dynamo.putItem was called once
     expect(dynamo.put.mock.calls[0].length).toEqual(1); // To be called with one param
-    expect(dynamo.put.mock.calls[0][0]).toEqual({
+    expect(dynamo.put.mock.calls[0][0]).toMatchObject({
       // First param was the serialized object
       Item: {
-        gameId: "gameId",
-        timestamp: "timestamp",
-        state: "{}",
+        gameId: "default",
+        state: JSON.stringify(game.state),
       },
       TableName: "Phase10",
     });
