@@ -3,9 +3,38 @@ const Player = require("../phase10/entities/Player");
 const ValidationError = require("../phase10/entities/ValidationError");
 const { fnSuccess } = require("../TestUtils");
 
+describe("PlayersRepository", () => {
+  test("export", () => {
+    expect(PlayersRepository).toBeInstanceOf(Function);
+  });
+
+  test("properties", () => {
+    const game = {
+      state: {},
+    };
+    const players = new PlayersRepository(game);
+    expect(players.game).toBe(game);
+  });
+});
+
+describe("PlayersRepository::constructor", () => {
+  test("loads game when state is null", () => {
+    const game = {
+      state: null,
+      load: jest.fn(async () => {
+        game.state = {};
+      }),
+    };
+    const players = new PlayersRepository(game);
+    expect(game.load.mock.calls.length).toBe(1);
+    expect(players.game.state).not.toBeNull();
+  });
+});
+
 describe("PlayersRepository::add", () => {
-  test("invalid name", () => {
-    const players = new PlayersRepository();
+  test("fails if the name is invalid", () => {
+    const game = { state: {} };
+    const players = new PlayersRepository(game);
     let rejects = expect(players.add(new Player())).rejects;
     rejects.toBeInstanceOf(ValidationError);
     rejects.toThrow("invalid_name");
@@ -15,11 +44,9 @@ describe("PlayersRepository::add", () => {
     rejects.toThrow("invalid_name");
   });
 
-  test("game already started", () => {
+  test("fails if a game has already started", () => {
     const game = {
-      load: fnSuccess({
-        state: { activePlayer: 2 },
-      }),
+      state: { activePlayer: 2 },
     };
     const players = new PlayersRepository(game);
     const player = new Player("1", "John Doe");
@@ -28,15 +55,13 @@ describe("PlayersRepository::add", () => {
     rejects.toThrow("game_already_started");
   });
 
-  test("game is full", () => {
+  test("fails if the game is full", () => {
     const players = [];
     for (let i = 1; i <= PlayersRepository.MAX_PLAYERS; ++i) {
       players.push(new Player(`p-${i}`, `Player ${i}`));
     }
     const game = {
-      load: fnSuccess({
-        state: { players, activePlayer: 0 },
-      }),
+      state: { players, activePlayer: 0 },
     };
     const repo = new PlayersRepository(game);
     const player = new Player("x", "John Doe");
@@ -45,83 +70,55 @@ describe("PlayersRepository::add", () => {
     rejects.toThrow("game_players_full");
   });
 
-  test("player joined aready", async () => {
-    const john = new Player("1", "John Doe");
-    const item = {
+  test("ignore when player joined aready", async () => {
+    const john = new Player("1", "John Doe", 0);
+    const game = {
       state: {
-        players: [{ ...john, color: 0 }],
+        players: [{ ...john }],
         activePlayer: 0,
       },
     };
-    const game = {
-      load: fnSuccess(item),
-      save: fnSuccess(),
-      create: jest.fn(),
-    };
 
     const players = new PlayersRepository(game);
-
-    const result = await players.add(john);
-    expect(game.load.mock.calls.length).toBe(1);
-    expect(game.create.mock.calls.length).toBe(0);
-    expect(game.save.mock.calls.length).toBe(0);
-    expect(item.state.players.length).toBe(1);
-    expect(item.state.players[0]).toEqual({ ...john, color: 0 });
-    expect(result).not.toBe(john);
-    expect(result).toBe(item.state.players[0]);
-    expect(result.color).toBe(0);
+    await players.add(john);
+    expect(game.state.players.length).toBe(1);
+    expect(game.state.players[0]).toEqual(john);
   });
 
-  test("create game and add first player", async () => {
-    const item = {
+  test("add first player", async () => {
+    const game = {
       state: {
         players: [],
-      },
-    };
-    const game = {
-      load: fnSuccess(),
-      save: fnSuccess(),
-      create: jest.fn(() => item),
-    };
-    const john = new Player("1", "John Doe");
-    const players = new PlayersRepository(game);
-
-    const result = await players.add(john);
-    expect(game.load.mock.calls.length).toBe(1);
-    expect(game.create.mock.calls.length).toBe(1);
-    expect(game.save.mock.calls.length).toBe(1);
-    expect(item.state.players.length).toBe(1);
-    expect(item.state.players[0]).toBe(john);
-    expect(item.state.players[0].color).toBe(0);
-    expect(result).toBe(john);
-  });
-
-  test("add player and update game", async () => {
-    const john = new Player("1", "John Doe");
-    const jane = new Player("2", "Jane Doe");
-
-    const item = {
-      state: {
-        players: [{ ...john, color: 0 }],
         activePlayer: 0,
       },
     };
-    const game = {
-      load: fnSuccess(item),
-      save: fnSuccess(),
-      create: jest.fn(),
-    };
+    const john = new Player("1", "John Doe");
     const players = new PlayersRepository(game);
 
-    const result = await players.add(jane);
-    expect(game.load.mock.calls.length).toBe(1);
-    expect(game.create.mock.calls.length).toBe(0);
-    expect(game.save.mock.calls.length).toBe(1);
-    expect(item.state.players.length).toBe(2);
-    expect(item.state.players[0]).not.toBe(john);
-    expect(item.state.players[0]).toEqual({ ...john, color: 0 });
-    expect(item.state.players[1]).toEqual({ ...jane, color: 1 });
-    expect(item.state.players[1].color).toBe(1);
-    expect(result).toBe(jane);
+    await players.add(john);
+    expect(game.state.players.length).toBe(1);
+    expect(game.state.players[0]).toBe(john);
+    expect(game.state.players[0].color).toBe(0);
+  });
+
+  test("add extra player", async () => {
+    const john = new Player("a", "John Doe", 0);
+    const jane = new Player("b", "Jane Doe", 1);
+
+    const game = {
+      state: {
+        players: [john, jane],
+        activePlayer: 0,
+      },
+    };
+
+    const players = new PlayersRepository(game);
+    const max = new Player("c", "Max Mustermann");
+    await players.add(max);
+    expect(game.state.players.length).toBe(3);
+    expect(game.state.players[0]).toBe(john);
+    expect(game.state.players[1]).toBe(jane);
+    expect(game.state.players[2]).toBe(max);
+    expect(game.state.players[2].color).toBe(2);
   });
 });
