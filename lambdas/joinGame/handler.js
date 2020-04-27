@@ -29,13 +29,13 @@ async function joinGame(dynamoDB, apigwManagementApi, event) {
 }
 
 async function playerJoinedGame(apigwManagementApi, newPlayer, currentPlayers) {
-  const message = {
+  const message = JSON.stringify({
     action: "playerJoinedGame",
     payload: {
       name: newPlayer.name,
       color: newPlayer.color,
     },
-  };
+  });
   const results = currentPlayers.map(async (player) => {
     try {
       if (

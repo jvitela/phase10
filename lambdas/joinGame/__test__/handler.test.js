@@ -27,7 +27,7 @@ describe("playerJoinedGame", () => {
     expect(currentPlayers[0].connectionId).toBeNull();
   });
 
-  test("post message to other players", async () => {
+  test("posts messages to other players", async () => {
     const apigwManagementApi = {
       postToConnection: fnSuccessReq(),
     };
@@ -37,13 +37,13 @@ describe("playerJoinedGame", () => {
     expect(apigwManagementApi.postToConnection.mock.calls.length).toBe(1);
     expect(apigwManagementApi.postToConnection.mock.calls[0][0]).toEqual({
       ConnectionId: "1a",
-      Data: {
+      Data: JSON.stringify({
         action: "playerJoinedGame",
         payload: {
           name: "Jane Doe",
           color: 1,
         },
-      },
+      }),
     });
     expect(currentPlayers[0].connectionId).not.toBeNull();
   });
@@ -162,13 +162,13 @@ describe("joinGame", () => {
     expect(dynamoDB.get.mock.calls.length).toBe(1);
     expect(dynamoDB.put.mock.calls.length).toBe(1);
     expect(apigwManagementApi.postToConnection.mock.calls.length).toBe(3);
-    const Data = {
+    const Data = JSON.stringify({
       action: "playerJoinedGame",
       payload: {
         name: anne.name,
         color: 3,
       },
-    };
+    });
     expect(apigwManagementApi.postToConnection.mock.calls[0][0]).toEqual({
       ConnectionId: john.connectionId,
       Data,
