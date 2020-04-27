@@ -36,7 +36,7 @@ async function playerJoinedGame(apigwManagementApi, newPlayer, currentPlayers) {
       color: newPlayer.color,
     },
   };
-  currentPlayers.forEach(async (player) => {
+  const results = currentPlayers.map(async (player) => {
     try {
       if (
         player.connectionId !== null &&
@@ -55,6 +55,7 @@ async function playerJoinedGame(apigwManagementApi, newPlayer, currentPlayers) {
       }
     }
   });
+  return Promise.all(results);
 }
 
 module.exports = {

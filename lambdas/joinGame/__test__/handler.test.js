@@ -1,6 +1,6 @@
 const Player = require("/opt/phase10/entities/Player");
 const ResponseAction = require("/opt/phase10/entities/ResponseAction");
-const { fnSuccess, fnError, fnSuccessReq, fnErrorReq } = require("TestUtils");
+const { fnSuccessReq, fnErrorReq } = require("TestUtils");
 const { joinGame, playerJoinedGame } = require("../handler");
 
 describe("playerJoinedGame", () => {
@@ -94,7 +94,7 @@ describe("joinGame", () => {
 
   test("returns ResponseAction with statusCode 201", async () => {
     const dynamoDB = {
-      get: fnSuccessReq({}),
+      get: fnSuccessReq({}), // new game
       put: fnSuccessReq(),
     };
     const apigwManagementApi = {
@@ -115,5 +115,71 @@ describe("joinGame", () => {
         },
       })
     );
+    expect(dynamoDB.get.mock.calls.length).toBe(1);
+    expect(dynamoDB.put.mock.calls.length).toBe(1);
+    expect(apigwManagementApi.postToConnection.mock.calls.length).toBe(0);
+  });
+
+  test("posts messages to other players", async () => {
+    const john = new Player("1a", "John", 0);
+    const jane = new Player("1b", "Jane", 1);
+    const max = new Player("1c", "Max", 2);
+    const anne = new Player("2a", "Anne");
+
+    const dynamoDB = {
+      get: fnSuccessReq({
+        Item: {
+          state: JSON.stringify({
+            activePlayer: 0,
+            players: [john, jane, max],
+          }),
+        },
+      }),
+      put: fnSuccessReq(),
+    };
+    const apigwManagementApi = {
+      postToConnection: fnSuccessReq(),
+    };
+    const event = {
+      requestContext: {
+        connectionId: anne.connectionId,
+      },
+      body: JSON.stringify({
+        payload: { name: anne.name },
+      }),
+    };
+    const response = await joinGame(dynamoDB, apigwManagementApi, event);
+
+    expect(response).toBeInstanceOf(ResponseAction);
+    expect(response).toEqual(
+      new ResponseAction(201, "joinGameSuccess", {
+        game: {
+          activePlayer: 0,
+          players: [john, jane, max, { ...anne, color: 3 }],
+        },
+      })
+    );
+    expect(dynamoDB.get.mock.calls.length).toBe(1);
+    expect(dynamoDB.put.mock.calls.length).toBe(1);
+    expect(apigwManagementApi.postToConnection.mock.calls.length).toBe(3);
+    const Data = {
+      action: "playerJoinedGame",
+      payload: {
+        name: anne.name,
+        color: 3,
+      },
+    };
+    expect(apigwManagementApi.postToConnection.mock.calls[0][0]).toEqual({
+      ConnectionId: john.connectionId,
+      Data,
+    });
+    expect(apigwManagementApi.postToConnection.mock.calls[1][0]).toEqual({
+      ConnectionId: jane.connectionId,
+      Data,
+    });
+    expect(apigwManagementApi.postToConnection.mock.calls[2][0]).toEqual({
+      ConnectionId: max.connectionId,
+      Data,
+    });
   });
 });
