@@ -8,26 +8,16 @@ describe("PlayersRepository", () => {
     expect(PlayersRepository).toBeInstanceOf(Function);
   });
 
+  test("constructor", () => {
+    const game = {};
+    const players = new PlayersRepository(game);
+    expect(players).toBeInstanceOf(PlayersRepository);
+  });
+
   test("properties", () => {
-    const game = {
-      state: {},
-    };
+    const game = {};
     const players = new PlayersRepository(game);
     expect(players.game).toBe(game);
-  });
-});
-
-describe("PlayersRepository::constructor", () => {
-  test("loads game when state is null", () => {
-    const game = {
-      state: null,
-      load: jest.fn(async () => {
-        game.state = {};
-      }),
-    };
-    const players = new PlayersRepository(game);
-    expect(game.load.mock.calls.length).toBe(1);
-    expect(players.game.state).not.toBeNull();
   });
 });
 

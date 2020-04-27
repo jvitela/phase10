@@ -5,10 +5,6 @@ const MAX_PLAYERS = 6;
 class PlayersRepository {
   constructor(gameRepository) {
     this.game = gameRepository;
-
-    if (!this.game.state) {
-      this.game.load();
-    }
   }
 
   async add(newPlayer) {
