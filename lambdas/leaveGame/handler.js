@@ -1,11 +1,5 @@
 const GameRepository = require("/opt/phase10/repositories/GameRepository");
 
-/**
- *  TODO:
- *    - Close connection if game is full ?
- *    - Send message when player disconnects.
- *    - Let new players take over abandoned game (search by name?).
- */
 async function leaveGame(dynamoDB, apigwManagementApi, event) {
   const connectionId = event.requestContext.connectionId;
   const game = new GameRepository(dynamoDB);
