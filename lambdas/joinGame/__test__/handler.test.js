@@ -110,7 +110,7 @@ describe("joinGame", () => {
             discarded: [],
           },
           dices: [],
-          activePlayer: 0,
+          activePlayer: null,
           players: [new Player("123", "John Doe", 0)],
         },
       })

@@ -12,7 +12,7 @@ class GameRepository {
         discarded: [],
       },
       dices: [],
-      activePlayer: 0,
+      activePlayer: null,
       players: [],
     };
   }
