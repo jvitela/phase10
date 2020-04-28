@@ -55,7 +55,7 @@ describe("PlayersRepository::add", () => {
     ]);
   });
 
-  test("fails if a game has already started and there are not free spots", async () => {
+  test("fails if a game has already started and there are not free slots", async () => {
     const game = {
       state: {
         activePlayer: "b",
@@ -140,7 +140,7 @@ describe("PlayersRepository::add", () => {
     expect(game.state.players[2].color).toBe(2);
   });
 
-  test("reuse spot of abandoned player", async () => {
+  test("reuse unique slot of abandoned player", async () => {
     const john = new Player("a", "John", 0);
     const juan = new Player(null, "Juan", 1);
     const jane = new Player("c", "Jane", 2);
@@ -163,5 +163,32 @@ describe("PlayersRepository::add", () => {
     expect(game.state.players[1]).toBe(max);
     expect(game.state.players[2]).toBe(jane);
     expect(max.color).toBe(1);
+  });
+
+  test("reuse slot of abandoned player with same name", async () => {
+    const playerA = new Player("a", "Aaaa", 0);
+    const playerB = new Player(null, "Bbbb", 1);
+    const playerC = new Player(null, "Cccc", 2);
+    const playerD = new Player("d", "Dddd", 3);
+
+    // Juan is disconnected
+    const game = {
+      state: {
+        players: [playerA, playerB, playerC, playerD],
+        activePlayer: "a",
+      },
+    };
+
+    // We add a new player named Max
+    const players = new PlayersRepository(game);
+    const playerC2 = new Player("c2", "Cccc");
+    await players.add(playerC2);
+
+    expect(game.state.players.length).toBe(4);
+    expect(game.state.players[0]).toBe(playerA);
+    expect(game.state.players[1]).toBe(playerB);
+    expect(game.state.players[2]).toBe(playerC2);
+    expect(game.state.players[3]).toBe(playerD);
+    expect(playerC2.color).toBe(2);
   });
 });

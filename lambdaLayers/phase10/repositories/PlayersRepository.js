@@ -22,10 +22,8 @@ class PlayersRepository {
       return;
     }
 
-    // Check if there is a free spot
-    const freeIdx = state.players.findIndex(
-      (player) => player.connectionId === null
-    );
+    // Check if there is a free spot, prefers spots with same name as new player
+    let freeIdx = findFreeSlot(newPlayer.name, state.players);
 
     if (freeIdx === -1 && state.activePlayer !== null) {
       // Abort if a game is already started
@@ -45,6 +43,19 @@ class PlayersRepository {
       throw new ValidationError("game_players_full");
     }
   }
+}
+
+function findFreeSlot(newPlayerName, players) {
+  let freeIdx = -1;
+  players.forEach((player, idx) => {
+    if (
+      player.connectionId === null &&
+      (freeIdx === -1 || player.name === newPlayerName)
+    ) {
+      freeIdx = idx;
+    }
+  });
+  return freeIdx;
 }
 
 PlayersRepository.MAX_PLAYERS = MAX_PLAYERS;
