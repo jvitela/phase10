@@ -1,26 +1,29 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React from "react";
+import { Provider, useSelector } from "react-redux";
+import { configureStore, getDefaultMiddleware } from "@reduxjs/toolkit";
+import { LoginPanel } from "components/LoginPanel";
+import { LogoutPanel } from "components/LogoutPanel";
+import { phase10 } from "reducers/Phase10";
+
+const store = configureStore({
+  reducer: phase10.reducer,
+  middleware: [...getDefaultMiddleware(), phase10.middleware],
+  devTools: process.env.NODE_ENV !== "production",
+});
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Provider store={store}>
+      <div className="h-full flex flex-row justify-center items-center">
+        <Phase10 />
+      </div>
+    </Provider>
   );
+}
+
+function Phase10() {
+  const isLoggedIn = useSelector((state) => state.color >= 0);
+  return isLoggedIn ? <LogoutPanel /> : <LoginPanel />;
 }
 
 export default App;
