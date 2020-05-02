@@ -15,11 +15,11 @@ class PlayersRepository {
     const state = this.game.state;
 
     // Check if player is already in the list
-    const hasPlayer = state.players.find(
-      (player) => player.connectionId === newPlayer.connectionId
+    const color = state.players.findIndex(
+      (player) => player.id === newPlayer.id
     );
-    if (hasPlayer) {
-      return;
+    if (color !== -1) {
+      return color;
     }
 
     // Check if there is a free spot, prefers spots with same name as new player
@@ -33,12 +33,12 @@ class PlayersRepository {
 
     if (freeIdx !== -1) {
       // Take free spot
-      newPlayer.color = freeIdx;
       state.players[freeIdx] = newPlayer;
+      return freeIdx;
     } else if (state.players.length < MAX_PLAYERS) {
       // Add new player
-      newPlayer.color = state.players.length;
       state.players.push(newPlayer);
+      return state.players.length - 1;
     } else {
       throw new ValidationError("game_players_full");
     }
@@ -49,7 +49,7 @@ function findFreeSlot(newPlayerName, players) {
   let freeIdx = -1;
   players.forEach((player, idx) => {
     if (
-      player.connectionId === null &&
+      player.id === null &&
       (freeIdx === -1 || player.name === newPlayerName)
     ) {
       freeIdx = idx;

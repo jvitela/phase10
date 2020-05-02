@@ -116,7 +116,6 @@ describe("PlayersRepository::add", () => {
     await players.add(john);
     expect(game.state.players.length).toBe(1);
     expect(game.state.players[0]).toBe(john);
-    expect(game.state.players[0].color).toBe(0);
   });
 
   test("add extra player", async () => {
@@ -137,7 +136,6 @@ describe("PlayersRepository::add", () => {
     expect(game.state.players[0]).toBe(john);
     expect(game.state.players[1]).toBe(jane);
     expect(game.state.players[2]).toBe(max);
-    expect(game.state.players[2].color).toBe(2);
   });
 
   test("reuse unique slot of abandoned player", async () => {
@@ -156,13 +154,13 @@ describe("PlayersRepository::add", () => {
     // We add a new player named Max
     const players = new PlayersRepository(game);
     const max = new Player("d", "Max");
-    await players.add(max);
+    const color = await players.add(max);
 
     expect(game.state.players.length).toBe(3);
     expect(game.state.players[0]).toBe(john);
     expect(game.state.players[1]).toBe(max);
     expect(game.state.players[2]).toBe(jane);
-    expect(max.color).toBe(1);
+    expect(color).toBe(1);
   });
 
   test("reuse slot of abandoned player with same name", async () => {
@@ -182,13 +180,13 @@ describe("PlayersRepository::add", () => {
     // We add a new player named Max
     const players = new PlayersRepository(game);
     const playerC2 = new Player("c2", "Cccc");
-    await players.add(playerC2);
+    const color = await players.add(playerC2);
 
     expect(game.state.players.length).toBe(4);
     expect(game.state.players[0]).toBe(playerA);
     expect(game.state.players[1]).toBe(playerB);
     expect(game.state.players[2]).toBe(playerC2);
     expect(game.state.players[3]).toBe(playerD);
-    expect(playerC2.color).toBe(2);
+    expect(color).toBe(2);
   });
 });
