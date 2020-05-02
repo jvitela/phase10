@@ -9,10 +9,10 @@ describe("playerJoinedGame", () => {
       postToConnection: fnErrorReq(),
     };
     const currentPlayers = [
-      new Player(null, "John Doe", 0), // disconnected player
+      new Player(null, "John Doe"), // disconnected player
+      new Player("1b", "Jane Doe"),
     ];
-    const newPlayer = new Player("1b", "Jane Doe", 1);
-    await playerJoinedGame(apigwManagementApi, newPlayer, currentPlayers);
+    await playerJoinedGame(apigwManagementApi, 1, currentPlayers);
     expect(apigwManagementApi.postToConnection.mock.calls.length).toBe(0);
   });
 
@@ -20,20 +20,26 @@ describe("playerJoinedGame", () => {
     const apigwManagementApi = {
       postToConnection: fnErrorReq({ statusCode: 410, message: "Gone" }),
     };
-    const currentPlayers = [new Player("1a", "John Doe", 0)];
-    const newPlayer = new Player("1b", "Jane Doe", 0);
-    await playerJoinedGame(apigwManagementApi, newPlayer, currentPlayers);
+    const currentPlayers = [
+      new Player("1a", "John Doe"),
+      new Player("1b", "Jane Doe"),
+    ];
+
+    await playerJoinedGame(apigwManagementApi, 1, currentPlayers);
     expect(apigwManagementApi.postToConnection.mock.calls.length).toBe(1);
-    expect(currentPlayers[0].connectionId).toBeNull();
+    expect(currentPlayers[0].id).toBeNull();
   });
 
   test("posts messages to other players", async () => {
     const apigwManagementApi = {
       postToConnection: fnSuccessReq(),
     };
-    const currentPlayers = [new Player("1a", "John Doe", 0)];
-    const newPlayer = new Player("1b", "Jane Doe", 1);
-    await playerJoinedGame(apigwManagementApi, newPlayer, currentPlayers);
+    const currentPlayers = [
+      new Player("1a", "John Doe"),
+      new Player("1b", "Jane Doe"),
+    ];
+
+    await playerJoinedGame(apigwManagementApi, 1, currentPlayers);
     expect(apigwManagementApi.postToConnection.mock.calls.length).toBe(1);
     expect(apigwManagementApi.postToConnection.mock.calls[0][0]).toEqual({
       ConnectionId: "1a",
@@ -45,7 +51,7 @@ describe("playerJoinedGame", () => {
         },
       }),
     });
-    expect(currentPlayers[0].connectionId).not.toBeNull();
+    expect(currentPlayers[0].id).not.toBeNull();
   });
 });
 
@@ -104,15 +110,14 @@ describe("joinGame", () => {
     expect(response).toBeInstanceOf(ResponseAction);
     expect(response).toEqual(
       new ResponseAction(201, "joinGameSuccess", {
-        game: {
-          stacks: {
-            available: [],
-            discarded: [],
-          },
-          dices: [],
-          activePlayer: null,
-          players: [new Player("123", "John Doe", 0)],
+        stacks: {
+          available: [],
+          discarded: [],
         },
+        dices: [],
+        activePlayer: null,
+        players: [new Player("123", "John Doe")],
+        color: 0,
       })
     );
     expect(dynamoDB.get.mock.calls.length).toBe(1);
