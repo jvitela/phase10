@@ -6,13 +6,14 @@ async function leaveGame(dynamoDB, apigwManagementApi, event) {
 
   try {
     await game.load();
-    const player = game.state.players.find(
-      (player) => player.connectionId === connectionId
+    const color = game.state.players.findIndex(
+      (player) => player.id === connectionId
     );
 
-    if (player) {
-      player.connectionId = null;
-      await playerLeftGame(apigwManagementApi, player, game.state.players);
+    if (color !== -1) {
+      const player = game.state.players[color];
+      player.id = null;
+      await playerLeftGame(apigwManagementApi, color, game.state.players);
       await game.save();
       console.log("Player disconnected");
     }
@@ -21,27 +22,28 @@ async function leaveGame(dynamoDB, apigwManagementApi, event) {
   }
 }
 
-async function playerLeftGame(apigwManagementApi, player, currentPlayers) {
+async function playerLeftGame(apigwManagementApi, color, currentPlayers) {
+  const player = currentPlayers[color];
   const message = JSON.stringify({
     action: "playerLeftGame",
     payload: {
       name: player.name,
-      color: player.color,
+      color,
     },
   });
   const results = currentPlayers.map(async (player) => {
     try {
-      if (player.connectionId !== null) {
+      if (player.id !== null) {
         await apigwManagementApi
           .postToConnection({
-            ConnectionId: player.connectionId,
+            ConnectionId: player.id,
             Data: message,
           })
           .promise();
       }
     } catch (err) {
       if (err.statusCode === 410) {
-        player.connectionId = null;
+        player.id = null;
       }
     }
   });

@@ -12,7 +12,7 @@ describe("leaveGame", () => {
       get: fnSuccessReq({
         Item: {
           state: JSON.stringify({
-            players: [{ connectionId: "123", name: "Jane Doe", color: 1 }],
+            players: [{ id: "123", name: "Jane Doe" }],
           }),
         },
       }),
@@ -31,7 +31,7 @@ describe("leaveGame", () => {
     expect(request).toMatchObject({
       Item: expect.objectContaining({
         state: JSON.stringify({
-          players: [{ connectionId: null, name: "Jane Doe", color: 1 }],
+          players: [{ id: null, name: "Jane Doe" }],
         }),
       }),
     });
@@ -48,8 +48,8 @@ describe("leaveGame", () => {
         Item: {
           state: JSON.stringify({
             players: [
-              { connectionId: null, name: "John Doe", color: 0 },
-              { connectionId: "123", name: "Jane Doe", color: 1 },
+              { id: null, name: "John Doe" },
+              { id: "123", name: "Jane Doe" },
             ],
           }),
         },
@@ -76,8 +76,8 @@ describe("leaveGame", () => {
         Item: {
           state: JSON.stringify({
             players: [
-              { connectionId: "321", name: "John Doe", color: 0 },
-              { connectionId: "123", name: "Jane Doe", color: 1 },
+              { id: "321", name: "John Doe" },
+              { id: "123", name: "Jane Doe" },
             ],
           }),
         },
