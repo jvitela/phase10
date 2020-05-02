@@ -12,12 +12,11 @@ describe("Player", () => {
 
   test("properties", () => {
     const player = new Player("123", "John Doe");
-    expect(player.connectionId).toBe("123");
+    expect(player.id).toBe("123");
     expect(player.name).toBe("John Doe");
     expect(player.phase).toBe(1);
     expect(player.boardPosition).toBe(0);
     expect(player.cards).toEqual([]);
     expect(player.collections).toEqual([]);
-    expect(player.color).toBeNull();
   });
 });

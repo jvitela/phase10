@@ -1,12 +1,11 @@
 class Player {
-  constructor(connectionId, name, color = null) {
-    this.connectionId = connectionId;
+  constructor(id, name) {
+    this.id = id;
     this.name = name;
     this.phase = 1;
     this.boardPosition = 0;
     this.cards = [];
     this.collections = [];
-    this.color = color;
   }
 }
 
