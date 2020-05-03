@@ -1,5 +1,5 @@
-const { fnSuccessReq, fnErrorReq } = require("TestUtils");
-const leaveGame = require("../handler");
+const { fnSuccessReq, fnErrorReq } = require("/opt/TestUtils");
+const leaveGame = require("../leaveGame/handler");
 
 describe("leaveGame", () => {
   test("sets player connection to null", async () => {

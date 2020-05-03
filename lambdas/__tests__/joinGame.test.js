@@ -1,7 +1,7 @@
 const Player = require("/opt/phase10/entities/Player");
 const ResponseAction = require("/opt/phase10/entities/ResponseAction");
-const { fnSuccessReq, fnErrorReq } = require("TestUtils");
-const { joinGame, playerJoinedGame } = require("../handler");
+const { fnSuccessReq, fnErrorReq } = require("/opt/TestUtils");
+const { joinGame, playerJoinedGame } = require("../joinGame/handler");
 
 describe("playerJoinedGame", () => {
   test("Ignores new and disconnected players", async () => {

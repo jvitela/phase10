@@ -3,7 +3,7 @@ const {
   fnErrorReq,
   fnSuccess,
   fnError,
-} = require("../TestUtils");
+} = require("/opt/TestUtils");
 
 describe("TestUtils", () => {
   test("fnSuccessReq", () => {

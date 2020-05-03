@@ -1,4 +1,4 @@
-const Player = require("../phase10/entities/Player");
+const Player = require("/opt/phase10/entities/Player");
 
 describe("Player", () => {
   test("export", () => {

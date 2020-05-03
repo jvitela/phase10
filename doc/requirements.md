@@ -1,51 +1,47 @@
 = Phase 10 =
 
 == Entities ==
-  Board
-  Action
-  Card
-  Dice
-  CardsContainer
-  CardsStack
-  Player
+Board
+Action
+Card
+Dice
+CardsContainer
+CardsStack
+Player
 
 == Tables ==
-  Game (gameId, state)
+Game (gameId, state)
 
 == Actions ==
 
-  === User Joins a game ===
-    // Creates a game if none, or updates current game
-    //  Fails a recent game is already in progress
-    //  Deletes old games ?
-    => JOIN_GAME
+=== User Joins a game ===
+// Creates a game if none, or updates current game
+// Fails a recent game is already in progress
+// Deletes old games ?
+=> joinGame
 
     // only for active player
-    <= SUCCESSFULLY_JOINED_GAME
-      - gameId
-      - color
-      - state
+    <= joinGameSuccess
+      - game
 
     // only for active player
-    <= FAILED_TO_JOIN_GAME
+    <= joinGameError
       - message: "Game already in progress"
 
     // Other users
-    <= USER_JOINED_GAME
-      - name
-      - color
+    <= playerJoinedGame
+      - { name, color }
 
-  === Game starts ===
-    <= CHANGE_TURN
-      - next
-        - color
-        - dices [one, two]
-        - actions []
+=> startGame
+  // all users
+<= playerReady
+    - { name, color }
 
-  === Actions take one, two or three ===
-    => PLAY_ACTION
-      - action: draw_cards
-      - stacks [1..3]
+=== Game starts ===
+<= CHANGE_TURN - next - color - dices [one, two] - actions []
+
+=== Actions take one, two or three ===
+=> PLAY_ACTION - action: draw_cards - stacks [1..3]
 
     // Only for active player
     <= TAKE_CARDS
@@ -66,11 +62,8 @@
       - prev
         - discard // top discard must be visible to all players
 
-  === Action: take one & repeat turn ===
-    => PLAY_ACTION
-      - color
-      - action: draw_cards
-      - stacks: [1..1]
+=== Action: take one & repeat turn ===
+=> PLAY_ACTION - color - action: draw_cards - stacks: [1..1]
 
     <= TAKE_CARDS
       - cards [1..1]
@@ -91,11 +84,8 @@
         - color
         - discard
 
-  === Search Left or Right (Success) ===
-    => PLAY_ACTION
-      - color
-      - actionId: search_left|search_right
-      - cardNumber
+=== Search Left or Right (Success) ===
+=> PLAY_ACTION - color - actionId: search_left|search_right - cardNumber
 
     // Only to target user
     <= GET_NUMBER
@@ -109,7 +99,7 @@
       - cards [1..1]
 
     // Only to active player
-    <= TAKE_CARDS 
+    <= TAKE_CARDS
       - cards [1..1]
       - from: color
 
@@ -129,11 +119,8 @@
         - color
         - discard
 
-  === Search Left or Right (Fail) ===
-    => PLAY_ACTION
-      - color
-      - actionId: search_left|search_right
-      - cardNumber
+=== Search Left or Right (Fail) ===
+=> PLAY_ACTION - color - actionId: search_left|search_right - cardNumber
 
     // Only to active user
     <= TAKE_CARDS
@@ -155,9 +142,8 @@
         - color
         - discard
 
-  === Joker ===
-    => PLAY_ACTION
-      - action: Joker
+=== Joker ===
+=> PLAY_ACTION - action: Joker
 
     <= USER_DREW_JOKER
       - card
@@ -173,9 +159,8 @@
       - prev
         - discard
 
-  === Search One  ===
-    => PLAY_ACTION
-      - action: search_one
+=== Search One ===
+=> PLAY_ACTION - action: search_one
 
     // Only for requester
     <= CHOOSE_ONE_OF
@@ -193,10 +178,8 @@
       - prev
         - discard
 
-  === Replace cards ===
-    => PLAY_ACTION
-      - action: replace_cards
-      - discard [1..4]
+=== Replace cards ===
+=> PLAY_ACTION - action: replace_cards - discard [1..4]
 
     // Only for requester
     <= TAKE_CARDS
@@ -218,9 +201,8 @@
       - prev
         - discard
 
-  === Everyone takes one ===
-    => PLAY_ACTION
-      - action: everyone_take1
+=== Everyone takes one ===
+=> PLAY_ACTION - action: everyone_take1
 
     // First for active player
     <= TAKE_CARDS
@@ -243,28 +225,13 @@
 
 == Complete phase (before END_TURN) ==
 
-  => COMPLETE_PHASE
-    - collections []
-      - type
-      - cards
+=> COMPLETE_PHASE - collections [] - type - cards
 
-  <= PHASE_COMPLETED
-    - color
-    - phase
-    - collections []
+<= PHASE_COMPLETED - color - phase - collections []
 
-  => UPDATE_COLLECTIONS
-    - color []
-      - collection []
-        - cards []
+=> UPDATE_COLLECTIONS - color [] - collection [] - cards []
 
-  // Add cards to the specified user collection
-  <= COLLECTIONS_UPDATED
-    - color []
-      - collection []
-        - cards []
+// Add cards to the specified user collection
+<= COLLECTIONS_UPDATED - color [] - collection [] - cards []
 
-  <= GAME_ROUND_COMPLETE
-    - color
-    - phase
-
+<= GAME_ROUND_COMPLETE - color - phase

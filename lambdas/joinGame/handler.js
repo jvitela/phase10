@@ -2,7 +2,7 @@ const Player = require("/opt/phase10/entities/Player");
 const ValidationError = require("/opt/phase10/entities/ValidationError");
 const ResponseAction = require("/opt/phase10/entities/ResponseAction");
 const GameRepository = require("/opt/phase10/repositories/GameRepository");
-const PlayersRepository = require("/opt/phase10/repositories/PlayersRepository");
+const PlayersRepository = require("./repositories/PlayersRepository");
 
 // TODO:
 //  Move Player and PlayersRepository to lambda

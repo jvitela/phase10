@@ -1,7 +1,6 @@
-const PlayersRepository = require("../phase10/repositories/PlayersRepository");
-const Player = require("../phase10/entities/Player");
-const ValidationError = require("../phase10/entities/ValidationError");
-const { fnSuccess } = require("../TestUtils");
+const PlayersRepository = require("../joinGame/repositories/PlayersRepository");
+const Player = require("/opt/phase10/entities/Player");
+const ValidationError = require("/opt/phase10/entities/ValidationError");
 
 describe("PlayersRepository", () => {
   test("export", () => {

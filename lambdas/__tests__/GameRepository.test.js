@@ -1,5 +1,5 @@
-const GameRepository = require("../phase10/repositories/GameRepository");
-const { fnSuccessReq, fnErrorReq } = require("../TestUtils");
+const GameRepository = require("/opt/phase10/repositories/GameRepository");
+const { fnSuccessReq, fnErrorReq } = require("/opt/TestUtils");
 
 describe("GameRepository", () => {
   test("export", () => {

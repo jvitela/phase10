@@ -1,4 +1,4 @@
-const ValidationError = require("../entities/ValidationError");
+const ValidationError = require("/opt/phase10/entities/ValidationError");
 const isValidName = /^[a-zA-Z0-9.!_ ]{3,15}$/;
 const MAX_PLAYERS = 6;
 

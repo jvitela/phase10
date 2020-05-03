@@ -10,8 +10,7 @@
   },
   "jest": {
     "moduleNameMapper": {
-      "/opt/phase10/(.*)": "<rootDir>/../../lambdaLayers/phase10/$1",
-      "TestUtils": "<rootDir>../../lambdaLayers/TestUtils"
+      "/opt/(.*)": "<rootDir>/opt/$1"
     }
   }
 }

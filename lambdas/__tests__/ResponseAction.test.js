@@ -1,4 +1,4 @@
-const ResponseAction = require("../phase10/entities/ResponseAction");
+const ResponseAction = require("/opt/phase10/entities/ResponseAction");
 
 describe("ResponseAction", () => {
   test("export", () => {
