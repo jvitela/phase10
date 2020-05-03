@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Button } from "components/Button";
 import { Alert } from "components/Alert";
 import { PlayerNameInput } from "components/PlayerNameInput";
-import { phase10 } from "reducers/Phase10";
+import { phase10 } from "redux/Phase10";
 
 const isValidName = /^[a-zA-Z0-9.!_ ]{3,15}$/;
 

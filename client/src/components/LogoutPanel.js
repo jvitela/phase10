@@ -1,7 +1,7 @@
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Button } from "components/Button";
-import { phase10 } from "reducers/Phase10";
+import { phase10 } from "redux/Phase10";
 
 export function LogoutPanel() {
   const dispatch = useDispatch();

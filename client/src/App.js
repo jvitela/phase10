@@ -4,11 +4,17 @@ import { configureStore, getDefaultMiddleware } from "@reduxjs/toolkit";
 import { LoginPanel } from "components/LoginPanel";
 import { LogoutPanel } from "components/LogoutPanel";
 import { NotificationsList } from "components/Notifications";
-import { phase10 } from "reducers/Phase10";
+import { phase10 } from "redux/Phase10";
+import { sideEffectsMiddleware } from "redux/sideEffectsMiddleware";
+import { socketCommsMiddleware } from "redux/socketCommsMiddleware";
 
 const store = configureStore({
   reducer: phase10.reducer,
-  middleware: [...getDefaultMiddleware(), phase10.middleware],
+  middleware: [
+    ...getDefaultMiddleware(),
+    socketCommsMiddleware,
+    sideEffectsMiddleware,
+  ],
   devTools: process.env.NODE_ENV !== "production",
 });
 
