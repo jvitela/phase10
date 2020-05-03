@@ -25,88 +25,101 @@ export const phase10 = createSlice({
   },
 });
 
-const mockData = {
-  joinGameSuccess: {
-    action: "joinGameSuccess",
-    payload: {
-      color: 0,
-      stacks: { available: [], discarded: [] },
-      dices: [],
-      activePlayer: null,
-      players: [
-        {
-          id: "Lt8DGc7_FiACEcw=",
-          name: "Yoni",
-          phase: 1,
-          boardPosition: 0,
-          cards: [],
-          collections: [],
-        },
-      ],
-    },
-  },
-  joinGameError: {
-    action: "joinGameError",
-    payload: "error_message",
-  },
-};
+// const mockData = {
+//   joinGameSuccess: {
+//     action: "joinGameSuccess",
+//     payload: {
+//       color: 0,
+//       stacks: { available: [], discarded: [] },
+//       dices: [],
+//       activePlayer: null,
+//       players: [
+//         {
+//           id: "Lt8DGc7_FiACEcw=",
+//           name: "Yoni",
+//           phase: 1,
+//           boardPosition: 0,
+//           cards: [],
+//           collections: [],
+//         },
+//       ],
+//     },
+//   },
+//   joinGameError: {
+//     action: "joinGameError",
+//     payload: "error_message",
+//   },
+// };
 
 phase10.actions.joinGame = createAction("Phase10/joinGame", (name) => ({
   payload: { name },
   meta: {
     useSocket: true,
-    response: mockData.joinGameSuccess,
+    // response: mockData.joinGameSuccess,
   },
 }));
 
 phase10.actions.leaveGame = createAction("Phase10/leaveGame", () => ({
   meta: {
-    useSocket: true,
+    closeSocket: true,
   },
 }));
 
-const delay = (timeout) =>
-  new Promise((resolve) => {
-    setTimeout(resolve, timeout);
-  });
+// const delay = (timeout) =>
+//   new Promise((resolve) => {
+//     setTimeout(resolve, timeout);
+//   });
 
-function initSocket(store) {
-  async function respond(msg) {
-    if (!msg) {
-      return;
+function initSocket(store, data) {
+  const socket = new WebSocket(
+    "wss://ht2fzngod8.execute-api.eu-central-1.amazonaws.com/dev"
+  );
+
+  socket.onerror = function (error) {
+    console.error("Socket error", error);
+  };
+
+  socket.onopen = function () {
+    console.info("Socket open");
+    if (data) {
+      socket.send(data);
     }
-    await delay(1000);
+  };
+
+  socket.onclose = function () {
+    console.info("Socket closed");
+  };
+
+  socket.onmessage = function (event) {
+    console.info("Socket message", event);
+    const msg = JSON.parse(event.data);
     store.dispatch({
       type: `Phase10/${msg.action}`,
       payload: msg.payload,
     });
-  }
-
-  return {
-    send(data) {
-      console.log("socket.send", data);
-      return { respond };
-    },
   };
+
+  return socket;
 }
 
+let socket = null;
 phase10.middleware = (store) => (next) => (action) => {
-  let socket = null;
   console.log("Phase10Middleware", action);
 
-  if (action.meta && action.meta.useSocket) {
-    if (!socket) {
-      socket = initSocket(store);
+  if (action.meta) {
+    if (action.meta.closeSocket && socket) {
+      socket.close();
+    } else if (action.meta.useSocket) {
+      const data = JSON.stringify({
+        action: action.type.replace("Phase10/", ""),
+        payload: action.payload,
+      });
+      if (!socket) {
+        socket = initSocket(store, data);
+      } else {
+        socket.send(data);
+      }
     }
-    socket
-      .send(
-        JSON.stringify({
-          action: action.type.replace("Phase10/", ""),
-          payload: action.payload,
-        })
-      )
-      .respond(action.meta.response);
-    // return;
   }
 
   return next(action);
