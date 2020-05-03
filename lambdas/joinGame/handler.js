@@ -16,10 +16,11 @@ async function joinGame(dynamoDB, apigwManagementApi, event) {
   try {
     await game.load();
     const color = await players.add(player);
-    await playerJoinedGame(apigwManagementApi, color, game.state.players);
+    await playerJoinedGame(apigwManagementApi, color, players);
     await game.save();
     return new ResponseAction(201, "joinGameSuccess", {
       ...game.state,
+      players: players.getActivePlayers(color),
       color,
     });
   } catch (err) {
@@ -31,16 +32,15 @@ async function joinGame(dynamoDB, apigwManagementApi, event) {
   }
 }
 
-async function playerJoinedGame(apigwManagementApi, color, currentPlayers) {
-  const newPlayer = currentPlayers[color];
+async function playerJoinedGame(apigwManagementApi, color, players) {
   const message = JSON.stringify({
     action: "playerJoinedGame",
     payload: {
-      name: newPlayer.name,
+      player: players.getPlayerInfo(color),
       color,
     },
   });
-  const results = currentPlayers.map(async (player, idx) => {
+  const results = players.map(async (player, idx) => {
     try {
       if (player.id !== null && color !== idx) {
         await apigwManagementApi

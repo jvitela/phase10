@@ -43,6 +43,29 @@ class PlayersRepository {
       throw new ValidationError("game_players_full");
     }
   }
+
+  map(iterator) {
+    return this.game.state.players.map(iterator);
+  }
+
+  getPlayerInfo(color) {
+    const player = this.game.state.players[color];
+    return {
+      name: player.name,
+      phase: player.phase,
+      boardPosition: player.boardPosition,
+      collections: player.collections,
+    };
+  }
+
+  getActivePlayers(activeColor) {
+    return this.game.state.players.reduce((acc, player, color) => {
+      if (player.id) {
+        acc[color] = activeColor === color ? player : this.getPlayerInfo(color);
+      }
+      return acc;
+    }, []);
+  }
 }
 
 function findFreeSlot(newPlayerName, players) {
