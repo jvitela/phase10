@@ -1,4 +1,5 @@
 import { createSlice, createAction } from "@reduxjs/toolkit";
+import { addNotice } from "components/Notifications";
 
 function getInitialState() {
   return {};
@@ -21,6 +22,14 @@ export const phase10 = createSlice({
     },
     leaveGame() {
       return getInitialState();
+    },
+    playerJoinedGame(state, action) {
+      const { player, color } = action.payload;
+      state.players[color] = player;
+    },
+    playerLeftGame(state, action) {
+      const { color } = action.payload;
+      state.players[color] = null;
     },
   },
 });
@@ -55,7 +64,6 @@ phase10.actions.joinGame = createAction("Phase10/joinGame", (name) => ({
   payload: { name },
   meta: {
     useSocket: true,
-    // response: mockData.joinGameSuccess,
   },
 }));
 
@@ -87,6 +95,7 @@ function initSocket(store, data) {
   };
 
   socket.onclose = function () {
+    // TODO: Attempt to reconnect if connection was lost?
     console.info("Socket closed");
   };
 
@@ -109,6 +118,7 @@ phase10.middleware = (store) => (next) => (action) => {
   if (action.meta) {
     if (action.meta.closeSocket && socket) {
       socket.close();
+      socket = null;
     } else if (action.meta.useSocket) {
       const data = JSON.stringify({
         action: action.type.replace("Phase10/", ""),
@@ -122,5 +132,28 @@ phase10.middleware = (store) => (next) => (action) => {
     }
   }
 
+  if (action.type === "Phase10/playerLeftGame") {
+    const { name, color } = action.payload;
+    addNotice(
+      "TOASTS",
+      `Player ${name} (${getColorName(color)}) left the game`,
+      2000
+    );
+  }
+
+  if (action.type === "Phase10/playerJoinedGame") {
+    const { player, color } = action.payload;
+    addNotice(
+      "TOASTS",
+      `Player ${player.name} (${getColorName(color)}) joined the game`,
+      2000
+    );
+  }
+
   return next(action);
 };
+
+const colorNames = ["Red", "Green", "Blue", "Yellow", "Black", "White"];
+function getColorName(color) {
+  return color < colorNames.length ? colorNames[color] : null;
+}
