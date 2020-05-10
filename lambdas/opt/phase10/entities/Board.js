@@ -1,13 +1,13 @@
-const ANY = Symbol("ANY");
-const DRAW1 = Symbol("DRAW1");
-const DRAW2 = Symbol("DRAW2");
-const DRAW3 = Symbol("DRAW3");
-const JOKER = Symbol("JOKER");
-const DRAW1_AND_DICE = Symbol("DRAW1_AND_DICE");
-const ASK = Symbol("ASK");
-const SEARCH_DISCARDS = Symbol("SEARCH_DISCARDS");
-const DISCARD_AND_DRAW = Symbol("SEARCH_DISCARDS");
-const ALL_DRAW1 = Symbol("SEARCH_DISCARDS");
+const ANY = 0;
+const DRAW1 = 1;
+const DRAW2 = 2;
+const DRAW3 = 3;
+const JOKER = 4;
+const DRAW1_AND_DICE = 5;
+const ASK = 6;
+const SEARCH_DISCARDS = 7;
+const DISCARD_AND_DRAW = 8;
+const ALL_DRAW1 = 9;
 
 const BOARD = [
   ANY,
