@@ -18,5 +18,6 @@ describe("Player", () => {
     expect(player.boardPosition).toBe(0);
     expect(player.cards).toEqual([]);
     expect(player.collections).toEqual([]);
+    expect(player.isReady).toBe(false);
   });
 });
