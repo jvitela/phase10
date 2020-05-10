@@ -40,6 +40,7 @@ describe("ConnectionsRepository::postToAll", () => {
     expect(apigwManagementApi.postToConnection.mock.calls.length).toBe(1);
     expect(errors).toBe(true);
     expect(connections[0].id).toBeNull();
+    expect(connections[0].isReady).toBe(false);
   });
 
   test("JSON encodes data sent to connections", async () => {

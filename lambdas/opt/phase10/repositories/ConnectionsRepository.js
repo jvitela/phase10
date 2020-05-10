@@ -19,6 +19,7 @@ class ConnectionsRepository {
       } catch (err) {
         if (err.statusCode === 410) {
           connection.id = null;
+          connection.isReady = false;
           hasErrors = true;
         } else {
           throw err;
