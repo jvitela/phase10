@@ -1,6 +1,25 @@
 const { fnSuccessReq, fnErrorReq } = require("/opt/TestUtils");
 const startGame = require("../startGame/handler");
 
+expect.extend({
+  toBeWithinRange(received, floor, ceiling) {
+    const pass = received >= floor && received <= ceiling;
+    if (pass) {
+      return {
+        message: () =>
+          `expected ${received} not to be within range ${floor} - ${ceiling}`,
+        pass: true,
+      };
+    } else {
+      return {
+        message: () =>
+          `expected ${received} to be within range ${floor} - ${ceiling}`,
+        pass: false,
+      };
+    }
+  },
+});
+
 describe("startGame", () => {
   test("Does nothing if player id is not found", async () => {
     const event = {
@@ -179,11 +198,14 @@ describe("startGame", () => {
       JSON.parse(apigwManagementApi.postToConnection.mock.calls[0][0].Data)
     ).toMatchObject({
       action: "startTurn",
-      payload: {
-        color: expect.any(Number),
-        dices: [expect.any(Number), expect.any(Number)],
+      payload: expect.objectContaining({
+        color: expect.toBeWithinRange(0, 1),
+        dices: expect.arrayContaining([
+          expect.toBeWithinRange(1, 6),
+          expect.toBeWithinRange(1, 6),
+        ]),
         actions: [],
-      },
+      }),
     });
   });
 });
