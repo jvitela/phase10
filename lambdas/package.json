@@ -12,5 +12,11 @@
     "moduleNameMapper": {
       "/opt/(.*)": "<rootDir>/opt/$1"
     }
+  },
+  "dependencies": {
+    "lodash.random": "^3.2.0",
+    "lodash.range": "^3.2.0",
+    "lodash.shuffle": "^4.2.0",
+    "lodash.tointeger": "^4.0.4"
   }
 }
