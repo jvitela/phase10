@@ -5,8 +5,6 @@ const GameRepository = require("/opt/phase10/repositories/GameRepository");
 const PlayersRepository = require("./repositories/PlayersRepository");
 const ConnectionsRepository = require("/opt/phase10/repositories/ConnectionsRepository");
 
-// TODO:
-//  Move Player and PlayersRepository to lambda
 async function joinGame(dynamoDB, apigwManagementApi, event) {
   const connectionId = event.requestContext.connectionId;
   const body = JSON.parse(event.body);
