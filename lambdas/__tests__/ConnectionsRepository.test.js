@@ -77,4 +77,26 @@ describe("ConnectionsRepository::postToAll", () => {
       Data: '"foo bar"',
     });
   });
+
+  test("Posts individual messages to each connection", async () => {
+    const apigwManagementApi = {
+      postToConnection: fnSuccessReq(),
+    };
+    const connections = [{ id: "1a" }, { id: "1b" }];
+    const comms = new ConnectionsRepository(apigwManagementApi);
+    const errors = await comms.postToAll(
+      connections,
+      (item, idx) => `${item.id}: ${idx}`
+    );
+    expect(apigwManagementApi.postToConnection.mock.calls.length).toBe(2);
+    expect(errors).toBe(false);
+    expect(apigwManagementApi.postToConnection.mock.calls[0][0]).toEqual({
+      ConnectionId: "1a",
+      Data: '"1a: 0"',
+    });
+    expect(apigwManagementApi.postToConnection.mock.calls[1][0]).toEqual({
+      ConnectionId: "1b",
+      Data: '"1b: 1"',
+    });
+  });
 });
