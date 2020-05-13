@@ -1,5 +1,5 @@
 const AWS = require("aws-sdk");
-const { joinGame } = require("./handler");
+const joinGame = require("./handler");
 
 AWS.config.update({ region: process.env.AWS_REGION });
 const dynamoDB = new AWS.DynamoDB.DocumentClient({ apiVersion: "2012-08-10" });
