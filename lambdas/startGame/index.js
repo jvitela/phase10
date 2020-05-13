@@ -11,5 +11,6 @@ exports.handler = async function handler(event) {
       event.requestContext.domainName + "/" + event.requestContext.stage,
   });
 
-  await startGame(dynamoDB, apigwManagementApi, event);
+  const response = await startGame(dynamoDB, apigwManagementApi, event);
+  return response;
 };

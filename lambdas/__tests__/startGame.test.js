@@ -1,3 +1,4 @@
+const ResponseAction = require("/opt/phase10/entities/ResponseAction");
 const board = require("/opt/phase10/entities/Board");
 const { fnSuccessReq, fnErrorReq } = require("/opt/TestUtils");
 const startGame = require("../startGame/handler");
@@ -56,9 +57,13 @@ describe("startGame", () => {
     const apigwManagementApi = {
       postToConnection: fnErrorReq(),
     };
-    await startGame(dynamoDB, apigwManagementApi, event);
+    const response = await startGame(dynamoDB, apigwManagementApi, event);
     expect(dynamoDB.get.mock.calls.length).toBe(1);
     expect(apigwManagementApi.postToConnection.mock.calls.length).toBe(0);
+    expect(response).toBeInstanceOf(ResponseAction);
+    expect(response).toEqual(
+      new ResponseAction(400, "startGameError", "Player not found")
+    );
   });
 
   test("Updates the state of the player", async () => {
@@ -80,7 +85,7 @@ describe("startGame", () => {
     const apigwManagementApi = {
       postToConnection: fnErrorReq(),
     };
-    await startGame(dynamoDB, apigwManagementApi, event);
+    const response = await startGame(dynamoDB, apigwManagementApi, event);
     expect(apigwManagementApi.postToConnection.mock.calls.length).toBe(0);
     expect(dynamoDB.get.mock.calls.length).toBe(1);
     expect(dynamoDB.put.mock.calls.length).toBe(1);
@@ -91,6 +96,8 @@ describe("startGame", () => {
         }),
       },
     });
+    expect(response).toBeInstanceOf(ResponseAction);
+    expect(response).toEqual(new ResponseAction(200, "startGameSuccess"));
   });
 
   test("Sends playerReady message to all other players", async () => {

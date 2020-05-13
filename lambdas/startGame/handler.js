@@ -1,5 +1,6 @@
 const GameRepository = require("/opt/phase10/repositories/GameRepository");
 const ConnectionsRepository = require("/opt/phase10/repositories/ConnectionsRepository");
+const ResponseAction = require("/opt/phase10/entities/ResponseAction");
 const board = require("/opt/phase10/entities/Board");
 const initializeGame = require("./initializeGame");
 
@@ -13,6 +14,10 @@ const initializeGame = require("./initializeGame");
  *      },
  *      "body": "{\"action\":\"startGame\"}"
  *    }
+ * @returns
+ *    {"statusCode":400, body:"{\"action\":\"startGameError\",\"payload\":\"Player not found\"}"}
+ *    {"statusCode":500, body:"{\"action\":\"startGameError\",\"payload\":\"...\"}"}
+ *    {"statusCode":200, body:"{\"action\":\"startGameSuccess\"}"}
  */
 async function startGame(dynamoDB, apigwManagementApi, event) {
   const connectionId = event.requestContext.connectionId;
@@ -28,7 +33,7 @@ async function startGame(dynamoDB, apigwManagementApi, event) {
 
     // Abort if requester is not a registered player
     if (color === -1) {
-      return;
+      return new ResponseAction(400, "startGameError", "Player not found");
     }
 
     players[color].isReady = true;
@@ -59,8 +64,11 @@ async function startGame(dynamoDB, apigwManagementApi, event) {
     }
 
     await game.save();
+
+    return new ResponseAction(200, "startGameSuccess");
   } catch (err) {
     console.error(err);
+    return new ResponseAction(500, "startGameError", err.message);
   }
 }
 
