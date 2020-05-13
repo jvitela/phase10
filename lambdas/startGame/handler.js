@@ -52,8 +52,8 @@ async function startGame(dynamoDB, apigwManagementApi, event) {
         },
       });
     } else if (otherPlayers.length > 0) {
-      Object.assign(game.state, initializeGame(game.state.players));
-      await comms.postToAll(players, (player) => ({
+      Object.assign(game.state, initializeGame(players));
+      await comms.postToAll(game.state.players, (player) => ({
         action: "startTurn",
         payload: {
           color: game.state.activePlayer,

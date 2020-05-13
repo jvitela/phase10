@@ -195,8 +195,20 @@ describe("startGame", () => {
             activePlayer: 0,
             dices: [1, 2],
             players: [
-              { id: "1a", name: "Player01", isReady: false, boardPosition: 0 },
-              { id: "1b", name: "Player02", isReady: true, boardPosition: 0 },
+              {
+                id: "1a",
+                name: "Player01",
+                isReady: false,
+                boardPosition: 0,
+                cards: [],
+              },
+              {
+                id: "1b",
+                name: "Player02",
+                isReady: true,
+                boardPosition: 0,
+                cards: [],
+              },
             ],
           }),
         },
@@ -217,9 +229,6 @@ describe("startGame", () => {
       ConnectionId: "1b",
       Data: expect.any(String),
     });
-    expect(apigwManagementApi.postToConnection.mock.calls[0][0].Data).toBe(
-      apigwManagementApi.postToConnection.mock.calls[1][0].Data
-    );
     expect(
       JSON.parse(apigwManagementApi.postToConnection.mock.calls[0][0].Data)
     ).toMatchObject({
@@ -239,6 +248,18 @@ describe("startGame", () => {
             boardPosition: expect.toBeWithinRange(0, board.length),
             action: expect.toBeOneOf(Object.values(board.actions)),
           }),
+        ]),
+        cards: expect.arrayContaining([
+          expect.toBeWithinRange(0, 48),
+          expect.toBeWithinRange(0, 48),
+          expect.toBeWithinRange(0, 48),
+          expect.toBeWithinRange(0, 48),
+          expect.toBeWithinRange(0, 48),
+          expect.toBeWithinRange(0, 48),
+          expect.toBeWithinRange(0, 48),
+          expect.toBeWithinRange(0, 48),
+          expect.toBeWithinRange(0, 48),
+          expect.toBeWithinRange(0, 48),
         ]),
       }),
     });
