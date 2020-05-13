@@ -2,7 +2,7 @@ const { fnSuccessReq, fnErrorReq } = require("/opt/TestUtils");
 const leaveGame = require("../leaveGame/handler");
 
 describe("leaveGame", () => {
-  test("sets player connection to null", async () => {
+  test("sets player id to null and isReady to false", async () => {
     const event = {
       requestContext: {
         connectionId: "123",
@@ -12,7 +12,7 @@ describe("leaveGame", () => {
       get: fnSuccessReq({
         Item: {
           state: JSON.stringify({
-            players: [{ id: "123", name: "Jane Doe" }],
+            players: [{ id: "123", name: "Jane Doe", isReady: true }],
           }),
         },
       }),
@@ -31,7 +31,7 @@ describe("leaveGame", () => {
     expect(request).toMatchObject({
       Item: expect.objectContaining({
         state: JSON.stringify({
-          players: [{ id: null, name: "Jane Doe" }],
+          players: [{ id: null, name: "Jane Doe", isReady: false }],
         }),
       }),
     });

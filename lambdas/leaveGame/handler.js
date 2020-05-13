@@ -15,6 +15,7 @@ async function leaveGame(dynamoDB, apigwManagementApi, event) {
     if (color !== -1) {
       const player = game.state.players[color];
       player.id = null;
+      player.isReady = false;
       comms.postToAll(game.state.players, {
         action: "playerLeftGame",
         payload: {
