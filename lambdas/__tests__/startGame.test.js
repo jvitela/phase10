@@ -182,7 +182,7 @@ describe("startGame", () => {
     });
   });
 
-  test("Sends startTurn message to all players", async () => {
+  test("Sends startGameSuccess message to all players", async () => {
     const event = {
       requestContext: {
         connectionId: "1a",
@@ -232,7 +232,7 @@ describe("startGame", () => {
     expect(
       JSON.parse(apigwManagementApi.postToConnection.mock.calls[0][0].Data)
     ).toMatchObject({
-      action: "startTurn",
+      action: "startGameSuccess",
       payload: expect.objectContaining({
         color: expect.toBeWithinRange(0, 1),
         dices: expect.arrayContaining([

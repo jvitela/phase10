@@ -59,10 +59,6 @@ describe("joinGame", () => {
     expect(response).toBeInstanceOf(ResponseAction);
     expect(response).toEqual(
       new ResponseAction(201, "joinGameSuccess", {
-        stacks: {
-          available: [],
-          discarded: [],
-        },
         dices: [],
         activePlayer: null,
         players: [new Player("123", "John Doe")],

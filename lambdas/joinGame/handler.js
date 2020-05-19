@@ -26,7 +26,8 @@ async function joinGame(dynamoDB, apigwManagementApi, event) {
     });
     await game.save();
     return new ResponseAction(201, "joinGameSuccess", {
-      ...game.state,
+      dices: game.state.dices,
+      activePlayer: game.state.activePlayer,
       players: players.getActivePlayers(color),
       color,
     });
