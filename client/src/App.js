@@ -47,6 +47,10 @@ function App() {
   );
 }
 
+// https://css-tricks.com/creating-a-3d-cube-image-gallery/
+// https://3dtransforms.desandro.com/cube
+// https://codepen.io/thireven/pen/wYXEoV
+// https://codepen.io/rn404/pen/mEpiG
 function Phase10() {
   const isLoggedIn = useSelector((state) => state.color >= 0);
   return isLoggedIn ? <LogoutPanel /> : <LoginPanel />;
