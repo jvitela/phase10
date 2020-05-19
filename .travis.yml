@@ -1,0 +1,16 @@
+language: node_js
+
+node_js:
+  - stable
+
+install:
+  - cd ./client
+  - npm install
+  - cd ../lambdas
+  - npm install
+
+script:
+  - cd ../client
+  - npm test
+  - cd ../lambdas
+  - npm test
