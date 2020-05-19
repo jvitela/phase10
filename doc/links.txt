@@ -39,3 +39,9 @@ https://docs.aws.amazon.com/toolkit-for-vscode/
 
 Cloud9 (IDE)
 https://aws.amazon.com/cloud9/
+
+Serverless framework
+https://www.serverless.com/framework/docs/getting-started/
+
+Setup CI/CD Pipeline for AWS Lambda using Github & Travis CI
+https://medium.com/swlh/setup-ci-cd-pipeline-for-aws-lambda-using-github-travis-ci-9812c8ef7199
