@@ -6,6 +6,7 @@ export const TextInput = React.forwardRef(
     const [hasFocus, setFocus] = useState(false);
 
     const cls = classnames(
+      "block",
       "shadow-inner",
       "border",
       "rounded",

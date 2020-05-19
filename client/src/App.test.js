@@ -1,9 +1,11 @@
-import React from 'react';
-import { render } from '@testing-library/react';
-import App from './App';
+import React from "react";
+import { render } from "@testing-library/react";
+import App from "./App";
 
-test('renders learn react link', () => {
+test("renders login form", () => {
   const { getByText } = render(<App />);
-  const linkElement = getByText(/learn react/i);
-  expect(linkElement).toBeInTheDocument();
+  const nameInput = getByText(/Name/i);
+  const joinButton = getByText(/Join/i);
+  expect(nameInput).toBeInTheDocument();
+  expect(joinButton).toBeInTheDocument();
 });
