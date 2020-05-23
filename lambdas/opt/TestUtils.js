@@ -52,7 +52,6 @@ expect.extend({
 });
 
 beforeEach(() => {
-  console.info("Before each...");
   console.error = jest.fn();
   console.warn = jest.fn();
   console.info = jest.fn();
@@ -64,7 +63,6 @@ afterEach(() => {
   console.warn.mockRestore();
   console.info.mockRestore();
   console.log.mockRestore();
-  console.info("after each...");
 });
 
 module.exports = {
