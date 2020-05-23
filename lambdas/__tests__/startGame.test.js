@@ -204,7 +204,7 @@ describe("startGame", () => {
           expect.toBeWithinRange(1, 6),
           expect.toBeWithinRange(1, 6),
         ]),
-        actions: expect.arrayContaining([
+        options: expect.arrayContaining([
           expect.objectContaining({
             boardPosition: expect.toBeWithinRange(0, board.length),
             action: expect.toBeOneOf(Object.values(board.actions)),

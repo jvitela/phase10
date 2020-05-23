@@ -28,7 +28,7 @@ function initializeGame(currentPlayers = []) {
   const dice1 = shuffleDice();
   const dice2 = shuffleDice();
   const activePlayer = pickRandomPlayer(players);
-  const actions = getActions(activePlayer, players, dice1, dice2);
+  const options = getOptions(activePlayer, players, dice1, dice2);
 
   return {
     players,
@@ -37,7 +37,7 @@ function initializeGame(currentPlayers = []) {
       available,
     },
     dices: [dice1, dice2],
-    actions,
+    options,
     activePlayer,
   };
 }
@@ -59,7 +59,7 @@ function pickRandomPlayer(players = []) {
   return colors[idx];
 }
 
-function getActions(activePlayer, players, dice1, dice2) {
+function getOptions(activePlayer, players, dice1, dice2) {
   const playersBoardPositions = players
     .filter((player) => player.isReady)
     .map((player) => player.boardPosition);

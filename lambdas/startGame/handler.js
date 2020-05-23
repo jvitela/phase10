@@ -57,9 +57,9 @@ async function startGame(dynamoDB, apigwManagementApi, event) {
         payload: {
           color: game.state.activePlayer,
           dices: game.state.dices,
-          actions: game.state.actions,
+          options: game.state.options,
           cards: player.cards,
-          discarded: game.state.stacks.discarded.slice(-1),
+          discarded: game.state.stacks.discarded.slice(-1)[0],
         },
       }));
     }
