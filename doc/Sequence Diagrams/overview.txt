@@ -1,0 +1,153 @@
+title Phase10
+actor User
+
+User->Frontend: Open page
+note left of Frontend: Displays Login Form
+
+User->Frontend: Enter name, Click Join
+Frontend->Lambda: joinGame (name)
+alt
+    Lambda->Frontend: joinGameError
+else
+    Lambda->Frontend: joinGameSuccess
+    note left of Lambda: 
+        sends messages to other players
+    end note
+    Lambda->Frontend: playerJoinedGame
+end
+
+opt Player disconnected
+    note left of Lambda: 
+        API Gateway detects disconnect and 
+        sends messages to other players
+    end note
+    Lambda->Frontend: playerLeftGame
+end
+
+
+note left of Frontend: Displays Room
+User->Frontend: Click Ready
+Frontend->Lambda: startGame
+opt all players ready
+    Lambda->Frontend: startGameSuccess
+end
+
+note over Frontend: Begin Game Loop
+
+note left of Frontend:
+    Displays dices results
+    Displays available actions
+end note
+
+opt Active Player
+note left of Frontend:
+    Choose action:
+    - drawOne
+    - drawTwo
+    - drawThree
+    - takeJoker
+    - drawOneAndRepeatTurn
+    - askNumber
+    - searchDiscards
+    - discardAndDraw
+    - allDrawOne
+end note    
+    User->Frontend: Clicks on selected Action
+end
+
+alt Draw One, Draw Two, Draw Three
+    User->Frontend: Select cards stack x(1..3)
+    Frontend->Lambda: drawCards (1..3)
+    alt Success
+        Lambda->Frontend: drawCardsSuccess
+        note left of Lambda: 
+            card(s) only visible for active player
+        end note
+    else Error
+        Lambda->Frontend: drawCardsError
+        note left of Lambda: 
+            statusCodes:
+            500 - Internal error
+            400 - Validation error
+            403 - Not players turn
+        end note
+    end
+else Take a Joker
+    Frontend->Lambda: takeJoker
+    Lambda->Frontend: takeJokerSuccess
+    note left of Lambda: 
+        card visible for all players
+    end note
+else Ask players for a number
+    User->Frontend: Enter number to search (1-12)
+    User->Frontend: Select direction to search (Left, Right)
+    Frontend->Lambda: askNumber
+    Lambda->Frontend: askNumberSuccess
+    note left of Lambda:
+        result card only visible for active player
+        replacement card only visible for target player
+        target player visible for all
+    end note
+else Search one card in stack of discards
+    Frontend->Lambda: searchDiscards
+    Lambda->Frontend: searchDiscardsSuccess
+    note left of Lambda:
+        discards stack only visible for active player
+    end note
+    User->Frontend: Choose one card
+    note left of Frontend:
+        selected card send when turn ends 
+    end note
+else Discard [1..4] and draw [2..5]
+    User->Frontend: Select cards to discard (max 4)
+    Frontend->Lambda: discardAndDraw
+    Lambda->Frontend: discardAndDrawSuccess
+    note left of Lambda:
+        drawn cards only visible for active player
+    end note
+else All players draw one card
+    Frontend->Lambda: allDrawOne
+    Lambda->Frontend: allDrawOneSuccess
+    note left of Lambda:
+        drawn card only visible for each player
+    end note
+end
+
+alt
+    User->Frontend: Complete phase
+end
+alt
+    User->Frontend: Add cards to collections
+end
+User->Frontend: Select cards to discard
+User->Frontend: End turn
+
+Frontend->Lambda: endTurn
+Lambda->Frontend: endTurnSuccess
+
+opt next turn
+    note left of Frontend:
+        Displays top of discards stack
+        Displays updated position for active player
+        Displays updated phase for active player
+    end note
+    note over Frontend: Continue Game Loop
+else A player finished current Round
+    note over Frontend:  Displays Round Winner
+    alt If player didn't finish its phase
+        User->Frontend: Select cards to keep for next Round (max 5)
+        Frontend->Lambda: startGame
+    end
+    note left of Lambda:
+        When all players who didn't finish their
+        Phase confirm their cards to keep.
+    end note
+    Lambda->Frontend: startGameSuccess
+    note over Frontend:  Continue Game Loop
+else A player reached Phase 10
+    note over Frontend: 
+        Displays Winner
+        Break Game Loop
+        Disconnect
+    end note
+end
