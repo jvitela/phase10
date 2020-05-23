@@ -1,6 +1,7 @@
 const _range = require("lodash.range");
 const _random = require("lodash.random");
 const _shuffle = require("lodash.shuffle");
+const board = require("/opt/phase10/entities/Board");
 
 function initializeGame(currentPlayers = []) {
   const deck = shuffleDeck();
@@ -24,14 +25,20 @@ function initializeGame(currentPlayers = []) {
     };
   });
 
+  const dice1 = shuffleDice();
+  const dice2 = shuffleDice();
+  const activePlayer = pickRandomPlayer(players);
+  const actions = getActions(activePlayer, players, dice1, dice2);
+
   return {
     players,
     stacks: {
       discarded,
       available,
     },
-    dices: [shuffleDice(), shuffleDice()],
-    activePlayer: pickRandomPlayer(players),
+    dices: [dice1, dice2],
+    actions,
+    activePlayer,
   };
 }
 
@@ -50,6 +57,37 @@ function pickRandomPlayer(players = []) {
   // pick a random index
   const idx = _random(0, colors.length - 1);
   return colors[idx];
+}
+
+function getActions(activePlayer, players, dice1, dice2) {
+  const playersBoardPositions = players
+    .filter((player) => player.isReady)
+    .map((player) => player.boardPosition);
+
+  const boardPosition = players[activePlayer].boardPosition;
+  return [
+    findFreeBoardPosition(dice1, boardPosition, playersBoardPositions),
+    findFreeBoardPosition(
+      dice1 === dice2 ? 2 * dice2 : dice2,
+      boardPosition,
+      playersBoardPositions
+    ),
+  ];
+}
+
+function findFreeBoardPosition(steps, boardPosition, playersBoardPositions) {
+  for (let count = 1; count <= steps; ) {
+    boardPosition = ++boardPosition % board.length;
+    // Count only the free board cells
+    if (!playersBoardPositions.includes(boardPosition)) {
+      ++count;
+    }
+  }
+
+  return {
+    boardPosition,
+    action: board.getAction(boardPosition),
+  };
 }
 
 module.exports = initializeGame;
