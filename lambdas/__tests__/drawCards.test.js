@@ -225,7 +225,7 @@ describe("drawCards", () => {
       },
       body: JSON.stringify({
         action: "drawCards",
-        payload: { option: 0, stacks: [0] },
+        payload: { option: 0, stacks: [0, 1] },
       }),
     };
     const dynamoDB = {
@@ -237,10 +237,10 @@ describe("drawCards", () => {
               { id: "1a", name: "Jane Doe", boardPosition: 0, cards: [] },
               { id: "1b", name: "John Doe", boardPosition: 4, cards: [] },
             ],
-            dices: [1, 4],
+            dices: [5, 6],
             options: [
-              { boardPosition: 1, action: DRAW1 },
-              { boardPosition: 5, action: DRAW2 }, // takes pos #5 because p2 is at pos #4
+              { boardPosition: 5, action: DRAW2 },
+              { boardPosition: 6, action: DRAW1 },
             ],
             stacks: {
               available: [1, 2, 3],
@@ -255,9 +255,41 @@ describe("drawCards", () => {
       postToConnection: fnSuccessReq(),
     };
     const response = await drawCards(dynamoDB, apigwManagementApi, event);
-    expect(dynamoDB.get).toHaveBeenCalledTimes(1);
     expect(response).toBeInstanceOf(ResponseAction);
     expect(response).toEqual(new ResponseAction(200, "drawCardsSuccess"));
     expect(console.info).toHaveBeenCalled();
+    expect(dynamoDB.get).toHaveBeenCalledTimes(1);
+    expect(dynamoDB.put).toHaveBeenCalledTimes(1);
+    expect(apigwManagementApi.postToConnection).toHaveBeenCalledTimes(1);
+    expect(dynamoDB.put).toHaveBeenCalledWith({
+      Item: {
+        gameId: "default",
+        state: JSON.stringify({
+          activePlayer: 0,
+          players: [
+            { id: "1a", name: "Jane Doe", boardPosition: 0, cards: [3, 6] },
+            { id: "1b", name: "John Doe", boardPosition: 4, cards: [] },
+          ],
+          dices: [5, 6],
+          options: [
+            { boardPosition: 5, action: DRAW2 },
+            { boardPosition: 6, action: DRAW1 },
+          ],
+          stacks: {
+            available: [1, 2],
+            discarded: [4, 5],
+          },
+        }),
+        timestamp: expect.anything(),
+      },
+      TableName: "Phase10",
+    });
+    expect(apigwManagementApi.postToConnection).toHaveBeenCalledWith({
+      ConnectionId: "1a",
+      Data: JSON.stringify({
+        action: "drawCardsSuccess",
+        payload: { cards: [3, 6], boardPosition: 5 },
+      }),
+    });
   });
 });

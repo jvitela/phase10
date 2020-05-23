@@ -16,7 +16,7 @@ const { ANY, DRAW1, DRAW2, DRAW3 } = board.actions;
  *      "body": "{\"action\":\"drawCards\",\"payload\":{\"option\":0,\"stacks\":[0..1]}}"
  *    }
  * @returns
- *    {"statusCode":200, body:"{\"action\":\"drawCardsSuccess\",\"payload\":{\"cards\":[0..48]}"}
+ *    {"statusCode":200, body:"{\"action\":\"drawCardsSuccess\",\"payload\":{\"cards\":[0..48],\"boardPosition\":1}"}
  *    {"statusCode":400, body:"{\"action\":\"drawCardsError\",\"payload\":\"...\"}"}
  *    {"statusCode":500, body:"{\"action\":\"drawCardsError\",\"payload\":\"...\"}"}
  */
@@ -33,11 +33,8 @@ async function drawCards(dynamoDB, apigwManagementApi, event) {
 
     validate(color, payload, game.state);
 
-    const cards = mapCards(
-      game.state.options[payload.option],
-      payload.stacks,
-      game.state
-    );
+    const option = game.state.options[payload.option];
+    const cards = mapCards(option, payload.stacks, game.state);
 
     players[color].cards = players[color].cards.concat(cards);
 
@@ -48,7 +45,7 @@ async function drawCards(dynamoDB, apigwManagementApi, event) {
         ConnectionId: connectionId,
         Data: JSON.stringify({
           action: "drawCardsSuccess",
-          payload: { cards },
+          payload: { cards, boardPosition: option.boardPosition },
         }),
       })
       .promise();
