@@ -1,7 +1,6 @@
 const GameRepository = require("/opt/phase10/repositories/GameRepository");
 const ConnectionsRepository = require("/opt/phase10/repositories/ConnectionsRepository");
 const ResponseAction = require("/opt/phase10/entities/ResponseAction");
-const board = require("/opt/phase10/entities/Board");
 const initializeGame = require("./initializeGame");
 
 /**
@@ -58,9 +57,9 @@ async function startGame(dynamoDB, apigwManagementApi, event) {
         payload: {
           color: game.state.activePlayer,
           dices: game.state.dices,
-          options: getOptions(game.state),
+          actions: game.state.actions,
           cards: player.cards,
-          lastDiscarded: game.state.stacks.discarded.slice(-1),
+          discarded: game.state.stacks.discarded.slice(-1),
         },
       }));
     }
@@ -72,40 +71,6 @@ async function startGame(dynamoDB, apigwManagementApi, event) {
     console.error(err);
     return new ResponseAction(500, "startGameError", err.message);
   }
-}
-
-function getOptions(gameState) {
-  const playersBoardPositions = gameState.players
-    .filter((player) => player.isReady)
-    .map((player) => player.boardPosition);
-
-  const dices = gameState.dices;
-  if (dices[0] === dices[1]) {
-    dices[1] = dices[0] + dices[1];
-  }
-
-  return [
-    findFreeBoardPosition(gameState, dices[0], playersBoardPositions),
-    findFreeBoardPosition(gameState, dices[1], playersBoardPositions),
-  ];
-}
-
-function findFreeBoardPosition(gameState, steps, playersBoardPositions) {
-  const activePlayer = gameState.players[gameState.activePlayer];
-  let boardPosition = activePlayer.boardPosition;
-
-  for (let count = 1; count <= steps; ) {
-    boardPosition = ++boardPosition % board.length;
-    // Count only the free board cells
-    if (!playersBoardPositions.includes(boardPosition)) {
-      ++count;
-    }
-  }
-
-  return {
-    boardPosition,
-    action: board.getAction(boardPosition),
-  };
 }
 
 module.exports = startGame;

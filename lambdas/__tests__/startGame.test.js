@@ -3,41 +3,6 @@ const board = require("/opt/phase10/entities/Board");
 const { fnSuccessReq, fnErrorReq } = require("/opt/TestUtils");
 const startGame = require("../startGame/handler");
 
-expect.extend({
-  toBeWithinRange(received, floor, ceiling) {
-    const pass = received >= floor && received <= ceiling;
-    if (pass) {
-      return {
-        message: () =>
-          `expected ${received} not to be within range ${floor} - ${ceiling}`,
-        pass: true,
-      };
-    } else {
-      return {
-        message: () =>
-          `expected ${received} to be within range ${floor} - ${ceiling}`,
-        pass: false,
-      };
-    }
-  },
-  toBeOneOf(received, items) {
-    const pass = items.includes(received);
-    if (pass) {
-      return {
-        message: () =>
-          `expected ${received} not to be one of (${items.join(", ")})`,
-        pass: true,
-      };
-    } else {
-      return {
-        message: () =>
-          `expected ${received} to be one of (${items.join(", ")})`,
-        pass: false,
-      };
-    }
-  },
-});
-
 describe("startGame", () => {
   test("Does nothing if player id is not found", async () => {
     const event = {
@@ -239,7 +204,7 @@ describe("startGame", () => {
           expect.toBeWithinRange(1, 6),
           expect.toBeWithinRange(1, 6),
         ]),
-        options: expect.arrayContaining([
+        actions: expect.arrayContaining([
           expect.objectContaining({
             boardPosition: expect.toBeWithinRange(0, board.length),
             action: expect.toBeOneOf(Object.values(board.actions)),
@@ -261,6 +226,7 @@ describe("startGame", () => {
           expect.toBeWithinRange(0, 48),
           expect.toBeWithinRange(0, 48),
         ]),
+        discarded: expect.toBeWithinRange(0, 48),
       }),
     });
   });
