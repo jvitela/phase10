@@ -1,7 +1,9 @@
 const GameRepository = require("/opt/phase10/repositories/GameRepository");
-const ConnectionsRepository = require("/opt/phase10/repositories/ConnectionsRepository");
+const ValidationError = require("/opt/phase10/entities/ValidationError");
 const ResponseAction = require("/opt/phase10/entities/ResponseAction");
 const board = require("/opt/phase10/entities/Board");
+
+const { ANY, DRAW1, DRAW2, DRAW3 } = board.actions;
 
 /**
  * @param {AWS.DynamoDB.DocumentClient} dynamoDB
@@ -11,7 +13,7 @@ const board = require("/opt/phase10/entities/Board");
  *      "requestContext": {
  *        "connectionId": "123"
  *      },
- *      "body": "{\"action\":\"drawCards\",\"payload\":{\"stacks\":[0..1]}}"
+ *      "body": "{\"action\":\"drawCards\",\"payload\":{\"option\":0,\"stacks\":[0..1]}}"
  *    }
  * @returns
  *    {"statusCode":200, body:"{\"action\":\"drawCardsSuccess\",\"payload\":{\"cards\":[0..48]}"}
@@ -22,57 +24,89 @@ async function drawCards(dynamoDB, apigwManagementApi, event) {
   const connectionId = event.requestContext.connectionId;
   const game = new GameRepository(dynamoDB);
   // const comms = new ConnectionsRepository(apigwManagementApi);
+
   try {
-    const { payload } = JSON.parse(event.body);
     await game.load();
     const players = game.state.players;
     const color = players.findIndex((player) => player.id === connectionId);
-    // Player sending the request is not the active player
-    if (color === -1 || game.state.activePlayer !== color) {
-      const errMsg = "Not Players turn";
-      console.error(errMsg);
-      return new ResponseAction(400, "drawCardsError", errMsg);
-    }
-    // const numCards = payload.cards.length;
-    // switch (numCards) {
-    //   case 1:
-    //     if (game.state.activeActions)
-    // }
-    //   const otherPlayers = players.filter((player) => player.id !== connectionId);
-    //   players[color].isReady = true;
-    //   const pendingPlayers = otherPlayers.reduce(
-    //     // do not count in player is disconnected or ready to start
-    //     (acc, player) => acc + (player.id === null || player.isReady ? 0 : 1),
-    //     0
-    //   );
-    //   if (pendingPlayers) {
-    //     await comms.postToAll(otherPlayers, {
-    //       action: "playerReady",
-    //       payload: {
-    //         name: players[color].name,
-    //         color,
-    //       },
-    //     });
-    //   } else if (otherPlayers.length > 0) {
-    //     Object.assign(game.state, initializeGame(players));
-    //     await comms.postToAll(game.state.players, (player) => ({
-    //       action: "drawCardsSuccess",
-    //       payload: {
-    //         color: game.state.activePlayer,
-    //         dices: game.state.dices,
-    //         options: getOptions(game.state),
-    //         cards: player.cards,
-    //         lastDiscarded: game.state.stacks.discarded.slice(-1),
-    //       },
-    //     }));
-    //   }
+    const { payload } = JSON.parse(event.body);
+
+    validate(color, payload, game.state);
+
+    const cards = mapCards(
+      game.state.options[payload.option],
+      payload.stacks,
+      game.state
+    );
+
+    players[color].cards = players[color].cards.concat(cards);
+
     await game.save();
+
+    await apigwManagementApi
+      .postToConnection({
+        ConnectionId: connectionId,
+        Data: JSON.stringify({
+          action: "drawCardsSuccess",
+          payload: { cards },
+        }),
+      })
+      .promise();
+
     console.info(`Player #${color} drawed cards`);
     return new ResponseAction(200, "drawCardsSuccess");
   } catch (err) {
     console.error(err);
-    return new ResponseAction(500, "drawCardsError", err.message);
+    return new ResponseAction(
+      err instanceof ValidationError ? 400 : 500,
+      "drawCardsError",
+      err.message
+    );
   }
+}
+
+function validate(color, payload, state) {
+  if (state.activePlayer === null) {
+    throw new ValidationError("Invalid state");
+  }
+
+  if (color === -1 || state.activePlayer !== color) {
+    throw new ValidationError("Not Players turn");
+  }
+
+  if (payload.option < 0 || payload.option > state.options.length) {
+    throw new ValidationError("Invalid option");
+  }
+
+  const stacks = [state.stacks.available, state.stacks.discarded];
+  for (let i = 0; i < payload.stacks.length; ++i) {
+    if (payload.stacks[i] < 0 || payload.stacks[i] > stacks.length) {
+      throw new ValidationError(`Invalid stack ${payload.stacks[i]}`);
+    }
+  }
+
+  const validActions = [DRAW1, DRAW2, DRAW3, ANY];
+  const option = state.options[payload.option];
+  if (!validActions.includes(option.action)) {
+    throw new ValidationError("Invalid action");
+  }
+}
+
+function mapCards(option, stacksIds, state) {
+  const stacks = [state.stacks.available, state.stacks.discarded];
+  let max;
+  switch (option.action) {
+    default:
+    case DRAW1:
+      max = 1;
+    case DRAW2:
+      max = 2;
+    case DRAW3:
+      max = 3;
+    case ANY:
+      max = 1 + (stacksIds.length % 3);
+  }
+  return stacksIds.slice(0, max).map((id) => stacks[id].pop());
 }
 
 module.exports = drawCards;
