@@ -265,7 +265,7 @@ describe("drawCards", () => {
     expect(console.info).toHaveBeenCalled();
     expect(dynamoDB.get).toHaveBeenCalledTimes(1);
     expect(dynamoDB.put).toHaveBeenCalledTimes(1);
-    expect(apigwManagementApi.postToConnection).toHaveBeenCalledTimes(1);
+    expect(apigwManagementApi.postToConnection).toHaveBeenCalledTimes(2);
     expect(dynamoDB.put).toHaveBeenCalledWith({
       Item: expect.objectContaining({
         gameId: "default",
@@ -292,11 +292,18 @@ describe("drawCards", () => {
         discarded: [4, 5],
       },
     });
-    expect(apigwManagementApi.postToConnection).toHaveBeenCalledWith({
+    expect(apigwManagementApi.postToConnection).toHaveBeenNthCalledWith(1, {
       ConnectionId: "1a",
       Data: JSON.stringify({
         action: "drawCardsSuccess",
-        payload: { cards: [3, 6], boardPosition: 5 },
+        payload: { color: 0, cards: [3, 6], boardPosition: 5 },
+      }),
+    });
+    expect(apigwManagementApi.postToConnection).toHaveBeenNthCalledWith(2, {
+      ConnectionId: "1b",
+      Data: JSON.stringify({
+        action: "drawCardsSuccess",
+        payload: { color: 0, option: 0, boardPosition: 5 },
       }),
     });
   });

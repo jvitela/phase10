@@ -1,4 +1,5 @@
 const GameRepository = require("/opt/phase10/repositories/GameRepository");
+const ConnectionsRepository = require("/opt/phase10/repositories/ConnectionsRepository");
 const ValidationError = require("/opt/phase10/entities/ValidationError");
 const ResponseAction = require("/opt/phase10/entities/ResponseAction");
 const board = require("/opt/phase10/entities/Board");
@@ -23,7 +24,7 @@ const { ANY, DRAW1, DRAW2, DRAW3 } = board.actions;
 async function drawCards(dynamoDB, apigwManagementApi, event) {
   const connectionId = event.requestContext.connectionId;
   const game = new GameRepository(dynamoDB);
-  // const comms = new ConnectionsRepository(apigwManagementApi);
+  const comms = new ConnectionsRepository(apigwManagementApi);
 
   try {
     await game.load();
@@ -46,15 +47,21 @@ async function drawCards(dynamoDB, apigwManagementApi, event) {
 
     await game.save();
 
-    await apigwManagementApi
-      .postToConnection({
-        ConnectionId: connectionId,
-        Data: JSON.stringify({
-          action: "drawCardsSuccess",
-          payload: { cards, boardPosition: option.boardPosition },
-        }),
-      })
-      .promise();
+    await comms.postToAll(game.state.players, (player) => ({
+      action: "drawCardsSuccess",
+      payload:
+        connectionId === player.id
+          ? {
+              color,
+              cards,
+              boardPosition: option.boardPosition,
+            }
+          : {
+              color,
+              option: payload.option,
+              boardPosition: option.boardPosition,
+            },
+    }));
 
     console.info(`Player #${color} drawed cards`);
     return new ResponseAction(200, "drawCardsSuccess");
