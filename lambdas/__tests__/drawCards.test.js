@@ -41,7 +41,7 @@ describe("drawCards", () => {
         Item: {
           state: JSON.stringify({
             activePlayer: 0,
-            state: "PLAY_TURN",
+            state: "BEGIN_TURN",
             players: [
               { id: "1a", name: "Jane Doe" },
               { id: "1b", name: "John Doe" },
@@ -111,7 +111,7 @@ describe("drawCards", () => {
         Item: {
           state: JSON.stringify({
             activePlayer: 0,
-            state: "PLAY_TURN",
+            state: "BEGIN_TURN",
             players: [
               { id: "1a", name: "Jane Doe", boardPosition: 0 },
               { id: "1b", name: "John Doe", boardPosition: 0 },
@@ -153,7 +153,7 @@ describe("drawCards", () => {
         Item: {
           state: JSON.stringify({
             activePlayer: 0,
-            state: "PLAY_TURN",
+            state: "BEGIN_TURN",
             players: [
               { id: "1a", name: "Jane Doe", boardPosition: 0 },
               { id: "1b", name: "John Doe", boardPosition: 0 },
@@ -195,7 +195,7 @@ describe("drawCards", () => {
         Item: {
           state: JSON.stringify({
             activePlayer: 0,
-            state: "PLAY_TURN",
+            state: "BEGIN_TURN",
             players: [
               { id: "1a", name: "Jane Doe", boardPosition: 0 },
               { id: "1b", name: "John Doe", boardPosition: 0 },
@@ -237,7 +237,7 @@ describe("drawCards", () => {
         Item: {
           state: JSON.stringify({
             activePlayer: 0,
-            state: "PLAY_TURN",
+            state: "BEGIN_TURN",
             players: [
               { id: "1a", name: "Jane Doe", boardPosition: 0, cards: [] },
               { id: "1b", name: "John Doe", boardPosition: 4, cards: [] },
@@ -275,7 +275,7 @@ describe("drawCards", () => {
       TableName: "Phase10",
     });
     expect(JSON.parse(dynamoDB.put.mock.calls[0][0].Item.state)).toMatchObject({
-      state: "PLAY_TURN",
+      state: "BEGIN_TURN",
       selectedOption: 0,
       activePlayer: 0,
       players: [

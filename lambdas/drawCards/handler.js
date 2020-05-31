@@ -76,7 +76,7 @@ async function drawCards(dynamoDB, apigwManagementApi, event) {
 }
 
 function validate(color, payload, state) {
-  if (state.state !== "PLAY_TURN" || state.activePlayer === null) {
+  if (state.state !== "BEGIN_TURN" || state.activePlayer === null) {
     throw new ValidationError("Invalid state");
   }
 
