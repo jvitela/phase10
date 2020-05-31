@@ -41,6 +41,7 @@ describe("drawCards", () => {
         Item: {
           state: JSON.stringify({
             activePlayer: 0,
+            state: "PLAY_TURN",
             players: [
               { id: "1a", name: "Jane Doe" },
               { id: "1b", name: "John Doe" },
@@ -110,6 +111,7 @@ describe("drawCards", () => {
         Item: {
           state: JSON.stringify({
             activePlayer: 0,
+            state: "PLAY_TURN",
             players: [
               { id: "1a", name: "Jane Doe", boardPosition: 0 },
               { id: "1b", name: "John Doe", boardPosition: 0 },
@@ -151,6 +153,7 @@ describe("drawCards", () => {
         Item: {
           state: JSON.stringify({
             activePlayer: 0,
+            state: "PLAY_TURN",
             players: [
               { id: "1a", name: "Jane Doe", boardPosition: 0 },
               { id: "1b", name: "John Doe", boardPosition: 0 },
@@ -192,6 +195,7 @@ describe("drawCards", () => {
         Item: {
           state: JSON.stringify({
             activePlayer: 0,
+            state: "PLAY_TURN",
             players: [
               { id: "1a", name: "Jane Doe", boardPosition: 0 },
               { id: "1b", name: "John Doe", boardPosition: 0 },
@@ -233,6 +237,7 @@ describe("drawCards", () => {
         Item: {
           state: JSON.stringify({
             activePlayer: 0,
+            state: "PLAY_TURN",
             players: [
               { id: "1a", name: "Jane Doe", boardPosition: 0, cards: [] },
               { id: "1b", name: "John Doe", boardPosition: 4, cards: [] },
@@ -262,27 +267,30 @@ describe("drawCards", () => {
     expect(dynamoDB.put).toHaveBeenCalledTimes(1);
     expect(apigwManagementApi.postToConnection).toHaveBeenCalledTimes(1);
     expect(dynamoDB.put).toHaveBeenCalledWith({
-      Item: {
+      Item: expect.objectContaining({
         gameId: "default",
-        state: JSON.stringify({
-          activePlayer: 0,
-          players: [
-            { id: "1a", name: "Jane Doe", boardPosition: 0, cards: [3, 6] },
-            { id: "1b", name: "John Doe", boardPosition: 4, cards: [] },
-          ],
-          dices: [5, 6],
-          options: [
-            { boardPosition: 5, action: DRAW2 },
-            { boardPosition: 6, action: DRAW1 },
-          ],
-          stacks: {
-            available: [1, 2],
-            discarded: [4, 5],
-          },
-        }),
+        state: expect.any(String),
         timestamp: expect.anything(),
-      },
+      }),
       TableName: "Phase10",
+    });
+    expect(JSON.parse(dynamoDB.put.mock.calls[0][0].Item.state)).toMatchObject({
+      state: "PLAY_TURN",
+      selectedOption: 0,
+      activePlayer: 0,
+      players: [
+        { id: "1a", name: "Jane Doe", boardPosition: 0, cards: [3, 6] },
+        { id: "1b", name: "John Doe", boardPosition: 4, cards: [] },
+      ],
+      dices: [5, 6],
+      options: [
+        { boardPosition: 5, action: DRAW2 },
+        { boardPosition: 6, action: DRAW1 },
+      ],
+      stacks: {
+        available: [1, 2],
+        discarded: [4, 5],
+      },
     });
     expect(apigwManagementApi.postToConnection).toHaveBeenCalledWith({
       ConnectionId: "1a",

@@ -34,9 +34,15 @@ async function drawCards(dynamoDB, apigwManagementApi, event) {
     validate(color, payload, game.state);
 
     const option = game.state.options[payload.option];
-    const cards = mapCards(option, payload.stacks, game.state);
+    const cards = drawCardsFromStacks(
+      option.action,
+      payload.stacks,
+      game.state
+    );
 
     players[color].cards = players[color].cards.concat(cards);
+    game.state.selectedOption = payload.option;
+    game.state.state = "PLAY_TURN";
 
     await game.save();
 
@@ -63,7 +69,7 @@ async function drawCards(dynamoDB, apigwManagementApi, event) {
 }
 
 function validate(color, payload, state) {
-  if (state.activePlayer === null) {
+  if (state.state !== "PLAY_TURN" || state.activePlayer === null) {
     throw new ValidationError("Invalid state");
   }
 
@@ -89,10 +95,19 @@ function validate(color, payload, state) {
   }
 }
 
-function mapCards(option, stacksIds, state) {
+/**
+ * removes cards from the selected stacks
+ *
+ * @param {number} action
+ * @param {array} stacksIds
+ * @param {object} state
+ *
+ * @returns {array} the cards drawn
+ */
+function drawCardsFromStacks(action, stacksIds, state) {
   const stacks = [state.stacks.available, state.stacks.discarded];
   let max;
-  switch (option.action) {
+  switch (action) {
     default:
     case DRAW1:
       max = 1;

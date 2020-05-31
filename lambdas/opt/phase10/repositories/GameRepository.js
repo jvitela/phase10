@@ -15,6 +15,7 @@ class GameRepository {
       actions: [],
       activePlayer: null,
       players: [],
+      state: "INITIAL",
     };
   }
 

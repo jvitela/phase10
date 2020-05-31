@@ -39,6 +39,7 @@ function initializeGame(currentPlayers = []) {
     dices: [dice1, dice2],
     options,
     activePlayer,
+    state: "BEGIN_TURN",
   };
 }
 
