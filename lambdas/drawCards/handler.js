@@ -43,6 +43,7 @@ async function drawCards(dynamoDB, apigwManagementApi, event) {
 
     players[color].cards = players[color].cards.concat(cards);
     game.state.selectedOption = payload.option;
+    game.state.numCardsDrawn = cards.length;
     game.state.state = "PLAY_TURN";
 
     await game.save();

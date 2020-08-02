@@ -1,7 +1,8 @@
 const _range = require("lodash.range");
 const _random = require("lodash.random");
 const _shuffle = require("lodash.shuffle");
-const board = require("/opt/phase10/entities/Board");
+const pickRandomPlayer = require("/opt/phase10/pickRandomPlayer");
+const getOptions = require("/opt/phase10/getOptions");
 
 function initializeGame(currentPlayers = []) {
   const deck = shuffleDeck();
@@ -39,6 +40,8 @@ function initializeGame(currentPlayers = []) {
     dices: [dice1, dice2],
     options,
     activePlayer,
+    numCardsDrawn: 0,
+    selectedOption: 0,
     state: "BEGIN_TURN",
   };
 }
@@ -46,49 +49,5 @@ function initializeGame(currentPlayers = []) {
 const shuffleDeck = () => _shuffle([].concat(_range(48), _range(48)));
 
 const shuffleDice = () => _random(1, 6);
-
-function pickRandomPlayer(players = []) {
-  // Get the indexes for all the connected players.
-  const colors = players.reduce((acc, player, color) => {
-    if (player.isReady) {
-      acc.push(color);
-    }
-    return acc;
-  }, []);
-  // pick a random index
-  const idx = _random(0, colors.length - 1);
-  return colors[idx];
-}
-
-function getOptions(activePlayer, players, dice1, dice2) {
-  const playersBoardPositions = players
-    .filter((player) => player.isReady)
-    .map((player) => player.boardPosition);
-
-  const boardPosition = players[activePlayer].boardPosition;
-  return [
-    findFreeBoardPosition(dice1, boardPosition, playersBoardPositions),
-    findFreeBoardPosition(
-      dice1 === dice2 ? 2 * dice2 : dice2,
-      boardPosition,
-      playersBoardPositions
-    ),
-  ];
-}
-
-function findFreeBoardPosition(steps, boardPosition, playersBoardPositions) {
-  for (let count = 1; count <= steps; ) {
-    boardPosition = ++boardPosition % board.length;
-    // Count only the free board cells
-    if (!playersBoardPositions.includes(boardPosition)) {
-      ++count;
-    }
-  }
-
-  return {
-    boardPosition,
-    action: board.getAction(boardPosition),
-  };
-}
 
 module.exports = initializeGame;
